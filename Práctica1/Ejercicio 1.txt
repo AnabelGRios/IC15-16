@@ -1,0 +1,20 @@
+(assert (FichaPaciente
+                  (Nombre Pedro)
+                  (Casado No)
+                  (Direccion Madrid)))
+
+(assert (FichaPaciente
+                  (Nombre Juan)
+                  (Casado Si)
+                  (Direccion Granada)))
+
+(assert (DatosExploracion
+                  (Nombre Pedro)
+                  (Sintomas dolor cabeza picor vesiculas)
+                  (GravedadAfeccion Media)))
+
+(assert (DatosExploracion
+                  (Nombre Juan)
+                  (Sintomas picor vesiculas hinchado)
+                  (GravedadAfeccion Alta)))
+
