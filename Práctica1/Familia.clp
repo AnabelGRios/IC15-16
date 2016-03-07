@@ -20,6 +20,12 @@
   (field RelGenero)
 )
 
+(deftemplate RelacionComposicion
+	(field Rel1)
+	(field Rel2)
+	(field Rel3)
+)
+
 (deffacts Generos
   (Genero
     (Sexo Mujer)
@@ -234,8 +240,8 @@
     (Nombre2 Carmen))
   (Relacion
     (Rel Casados)
-    (Nombre1 Maria)
-    (Nombre2 JuanManuel))
+    (Nombre1 JuanManuel)
+    (Nombre2 Maria))
   (Relacion
     (Rel Casados)
     (Nombre1 Paco)
@@ -290,6 +296,22 @@
     (Nombre2 MariCarmen))
 )
 
+; El hermano de mi padre es mi tio
+(deffacts RelacionesComposicion
+	(RelacionComposicion
+		(Rel1 Padre)
+		(Rel2 Padre)
+		(Rel3 Abuelo))
+	(RelacionComposicion
+		(Rel1 Hermano)
+		(Rel2 Padre)
+		(Rel3 Tio))
+	(RelacionComposicion
+		(Rel1 Hijo)
+		(Rel2 Tio)
+		(Rel3 Primo))
+)
+
 (defrule IntroducirRelacionDual
   (Relacion
     (Rel ?R1)
@@ -314,4 +336,98 @@
     (Rel ?RG)
     (Nombre1 ?N2)
     (Nombre2 ?N1)))
+)
+
+(defrule IntroducirOtroPadre
+	(Relacion
+		(Rel Padre)
+		(Nombre1 ?N1)
+		(Nombre2 ?N2))
+	(Relacion
+		(Rel Casados)
+		(Nombre1 ?N1)
+		(Nombre2 ?N3))
+	=>
+	(assert (Relacion
+		(Rel Madre)
+		(Nombre1 ?N3)
+		(Nombre2 ?N2)))
+)
+
+(defrule IntroducirOtroPadre2
+	(Relacion
+		(Rel Madre)
+		(Nombre1 ?N1)
+		(Nombre2 ?N2))
+	(Relacion
+		(Rel Casados)
+		(Nombre1 ?N3)
+		(Nombre2 ?N1))
+	=>
+	(assert (Relacion
+		(Rel Padre)
+		(Nombre1 ?N3)
+		(Nombre2 ?N2)))
+)
+
+(defrule IntroducirHermanos
+	(Persona
+		(Sexo ?S)
+		(Nombre ?N1))
+	(Genero
+		(Sexo ?S)
+		(Rel Hijo)
+		(RelGenero ?RG))
+	(Relacion
+		(Rel ?RG)
+		(Nombre1 ?N1)
+		(Nombre2 ?N2))
+	(Relacion
+		(Rel Padre)
+		(Nombre1 ?N2)
+		(Nombre2 ?NH & ~?N1))
+	(Genero
+		(Sexo ?S)
+		(Rel Hermano)
+		(RelGenero ?RGH))
+	=>
+	(assert (Relacion
+		(Rel ?RGH)
+		(Nombre1 ?N1)
+		(Nombre2 ?NH)))
+)
+
+(defrule IntroducirRelacionesComposicion
+	(Relacion
+		(Rel ?R1)
+		(Nombre1 ?N1)
+		(Nombre2 ?N2))
+	(Relacion
+		(Rel ?R2)
+		(Nombre1 ?N2)
+		(Nombre2 ?N3))
+	(Genero
+		(Sexo Hombre)
+		(Rel ?R1)
+		(RelGenero ?RH1))
+	(Genero
+		(Sexo Hombre)
+		(Rel ?R2)
+		(RelGenero ?RH2))
+	(RelacionComposicion
+		(Rel1 ?RH1)
+		(Rel2 ?RH2)
+		(Rel3 ?RC))
+	(Persona
+		(Sexo ?S)
+		(Nombre ?N1))
+	(Genero
+		(Sexo ?S)
+		(Rel ?RC)
+		(RelGenero ?RGC))
+	=>
+	(assert (Relacion
+		(Rel ?RGC)
+		(Nombre1 ?N1)
+		(Nombre2 ?N3)))
 )
