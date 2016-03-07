@@ -26,6 +26,11 @@
 	(field Rel3)
 )
 
+(deftemplate RelacionAImprimir
+	(field Nombre1)
+	(field Nombre2)
+)
+
 (deffacts Generos
   (Genero
     (Sexo Mujer)
@@ -155,6 +160,38 @@
     (Sexo Hombre)
     (Rel Hija)
     (RelGenero Hijo))
+	(Genero
+		(Sexo Mujer)
+		(Rel Mujer)
+		(RelGenero Mujer))
+	(Genero
+		(Sexo Mujer)
+		(Rel Marido)
+		(RelGenero Mujer))
+	(Genero
+		(Sexo Hombre)
+		(Rel Mujer)
+		(RelGenero Marido))
+	(Genero
+		(Sexo Hombre)
+		(Rel Marido)
+		(RelGenero Marido))
+	(Genero
+		(Sexo Mujer)
+		(Rel Cuñado)
+		(RelGenero Cuñada))
+	(Genero
+		(Sexo Mujer)
+		(Rel Cuñada)
+		(RelGenero Cuñada))
+	(Genero
+		(Sexo Hombre)
+		(Rel Cuñado)
+		(RelGenero Cuñado))
+	(Genero
+		(Sexo Hombre)
+		(Rel Cuñada)
+		(RelGenero Cuñado))
 )
 
 (deffacts RelacionesDuales
@@ -231,23 +268,23 @@
 
 (deffacts Relaciones
   (Relacion
-    (Rel Casados)
+    (Rel Marido)
     (Nombre1 Pedro)
     (Nombre2 Encarna))
   (Relacion
-    (Rel Casados)
+    (Rel Marido)
     (Nombre1 Manuel)
     (Nombre2 Carmen))
   (Relacion
-    (Rel Casados)
+    (Rel Marido)
     (Nombre1 JuanManuel)
     (Nombre2 Maria))
   (Relacion
-    (Rel Casados)
+    (Rel Marido)
     (Nombre1 Paco)
     (Nombre2 Rosi))
   (Relacion
-    (Rel Casados)
+    (Rel Marido)
     (Nombre1 Antonio)
     (Nombre2 Regi))
   (Relacion
@@ -310,6 +347,10 @@
 		(Rel1 Hijo)
 		(Rel2 Tio)
 		(Rel3 Primo))
+	(RelacionComposicion
+		(Rel1 Marido)
+		(Rel2 Hermano)
+		(Rel3 Cuñado))
 )
 
 (defrule IntroducirRelacionDual
@@ -344,7 +385,7 @@
 		(Nombre1 ?N1)
 		(Nombre2 ?N2))
 	(Relacion
-		(Rel Casados)
+		(Rel Marido)
 		(Nombre1 ?N1)
 		(Nombre2 ?N3))
 	=>
@@ -360,7 +401,7 @@
 		(Nombre1 ?N1)
 		(Nombre2 ?N2))
 	(Relacion
-		(Rel Casados)
+		(Rel Mujer)
 		(Nombre1 ?N3)
 		(Nombre2 ?N1))
 	=>
@@ -430,4 +471,27 @@
 		(Rel ?RGC)
 		(Nombre1 ?N1)
 		(Nombre2 ?N3)))
+)
+
+(defrule GuardarRelacion
+	=>
+	(printout t "Introduzca el nombre de la primera persona:" crlf)
+	(bind ?N1 (read) )
+	(printout t "Introduzca el nombre de la segunda persona:" crlf)
+	(bind ?N2 (read))
+	(assert (RelacionAImprimir
+		(Nombre1 ?N1)
+		(Nombre2 ?N2)))
+)
+
+(defrule ImprimirRelacion
+	(RelacionAImprimir
+		(Nombre1 ?N1)
+		(Nombre2 ?N2))
+	(Relacion
+		(Rel ?Rel)
+		(Nombre1 ?N1)
+		(Nombre2 ?N2))
+	=>
+	(printout t ?N1 " es " ?Rel " de " ?N2 crlf)
 )
