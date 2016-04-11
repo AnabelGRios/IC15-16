@@ -12,36 +12,67 @@
 	(field numero)
 )
 
-(deftemplate IncrementaContador
+; Controla si ya se ha contado un hecho
+(deftemplate HechoYaContado
 	(field NombreHecho)
+	(field AtributoHecho)
 )
 
-; Tantos como hechos distintos haya
-(defglobal ?*contador1* = 0)
-(defglobal ?*contador2* = 0)
-
-(defrule ContadorHechos
-	(Hecho ?NombreHecho)
-	(ContarHechos ?NombreHecho)
-	=>
-	(assert (IncrementaContador
-		(NombreHecho ?NombreHecho)))
-)
-
-; Uno para cada uno de los hechos. Esto tiene que haber otra forma más bonita de hacerlo
-(defrule IncrementarContador
-	(IncrementaContador Hecho1)
-	=>
-	(bind ?*contador1* (+ ?*contador1* 1))
-
-)
-
-; A esta regla hay que ponerle que se ejecute la última
-; Una para cada uno de los hechos. Tiene que haber otra forma
 (defrule AnadirContador
-	(ContarHechos Hecho1)
+	(ContarHechos
+		(NombreHecho ?NombreHecho))
+	(not (NumeroHechos
+		(NombreHecho ?NombreHecho)))
 	=>
 	(assert (NumeroHechos
+		(NombreHecho ?NombreHecho)
+		(numero 0)))
+)
+
+(defrule IncrementaContador
+	?F<-(NumeroHechos
+		(NombreHecho ?NombreHecho)
+		(numero ?num))
+	(Hecho
+		(NombreHecho ?NombreHecho)
+		(AtributoHecho ?atributo))
+	(not (HechoYaContado
+		(NombreHecho ?NombreHecho)
+		(AtributoHecho ?atributo)))
+	=>
+	(bind ?num (+ ?num 1))
+	(assert (NumeroHechos
+		(NombreHecho ?NombreHecho)
+		(numero ?num)))
+	(assert (HechoYaContado
+		(NombreHecho ?NombreHecho)
+		(AtributoHecho ?atributo)))
+	(retract ?F)
+)
+
+(defrule MostrarContador
+	(declare (salience -1))
+	(NumeroHechos
+		(NombreHecho ?NombreHecho)
+		(numero ?num))
+	=>
+	(printout t "Hay " ?num " hechos del hecho " ?NombreHecho crlf)
+)
+
+(deffacts HechosPrueba
+	(Hecho
 		(NombreHecho Hecho1)
-		(numero ?*contador1*)))
+		(AtributoHecho atributo1))
+	(Hecho
+		(NombreHecho Hecho1)
+		(AtributoHecho atributo2))
+	(Hecho
+		(NombreHecho Hecho2)
+		(AtributoHecho atributo3))
+	(Hecho
+		(NombreHecho Hecho2)
+		(AtributoHecho atributo4))
+	(Hecho
+		(NombreHecho Hecho2)
+		(AtributoHecho atributo5))
 )
