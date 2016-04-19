@@ -1,0 +1,129 @@
+\documentclass[12pt]{article}
+
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,activeacute]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{enumerate}
+\usepackage{amsthm}
+\usepackage{float}
+\usepackage{anysize}
+
+\marginsize{2cm}{2cm}{2cm}{2cm}
+
+\title{Tema 1: Introducción a la Ingeniería del Conocimiento}
+\author{Anabel G\'omez R\'ios}
+
+
+\begin{document}
+\maketitle
+
+\rightline{\textit{¿Qué es un Sistema Basado en el Conocimiento?}}
+\rightline{\textit{¿Para qué problemas es adecuada esta metodología?}}
+\rightline{\textit{¿Cómo se desarrolla un SBC?}}
+\rightline{\textit{¿Cuál es la tarea de un ingeniero del conocimiento?}}
+\rightline{\textit{¿Cuál es la relación de la IC con las otras asignaturas de la rama?}}
+
+\section{Definiciones}
+\subsection{Dato}
+Mínima unidad semántica, por sí solo irrelevante, que no dice nada sobre el por qué de las cosas y no útil para la acción. Un dato aisladamente no representa información relevante para el ser humano, sino que éste (un conjunto de ellos) debe ser procesado para aportar información. Los datos convenientemente agrupados, estructurados e interpretados se consideran la base de la información humanamente relevante que se pueden utilizar en la toma de decisiones, la reducción de la incertidumbre o la realización de cálculos.
+
+\subsection{Información}
+Datos procesados y que tienen un significado (relevancia, propósito y contexto). Es un conjunto organizado de datos procesados, que constituyen un mensaje que cambia el estado de conocimiento del sujeto o sistema que recibe dicho mensaje.
+
+\subsection{Conocimiento}
+Experiencia, valores, información y el saber cómo que sirve para la incorporación de nuevos hechos e información y es útil para la acción. Hechos o información adquiridos por una persona a través de la experiencia o la educación, la comprensión teórica o práctica de un asunto referente a la realidad. Comparación. Predicción. Conexiones.\\
+El conocimiento es propósito y competencia, capacidad para generar una reacción, específico de un problema complejo, fuente vaya e incompleta, no solución directa y clara, e intuición, experiencia, no sólo libros. Dentro de un dominio, saber qué es mejor hacer para resolver un problema.
+
+\subsection{Sistemas Expertos}
+Sistemas que utilizan conocimiento experto (proporcionado por un humano) para resolver un problema complejo. Resuelven tareas que requieren \textbf{razonamiento} humano. Suelen interaccionar con el usuario durante la resolución del problema. Justifican la solución y el conocimiento es revisable y adaptable. Pretenden comportarse como un experto. Es importante que pueda explicar por qué hace cada paso, que se pueda ver por qué toma cada decisión y el proceso que sigue. Hay mucha dificultad en pasar el conocimiento que tiene el experto a la máquina, es decir, al implementar el conocimiento.
+
+\subsection{Sistemas Basados en el Conocimiento}
+La ingeniería de conocimiento produce SBC. Sistema software capaz de soportar la representación explícita del conocimiento de un dominio dado específico y de explotarlo a través de los mecanismos apropiados de razonamiento para proporcionar un comportamiento de nivel alto en la resolución de problemas.\\
+Son sistemas que usan conocimiento específico del \textbf{dominio} del problema. Conocimiento representado explícitamente de forma separada (\textbf{Base de Conocimientos}). Funcionamiento no algorítmico, suele incluir estrategias y estructuración (metaconocimiento).
+
+\section{Sistemas Basados en el Conocimiento}
+\subsection{Problemas adecuados para SBC}
+Son adecuados para problemas poco estructurados en los que nos podemos encontrar
+\begin{enumerate}
+\item Requisitos subjetivos (aunque controlados) que una máquina no sería capaz de resolver pero cualquier humano sí.
+\item Entradas inconsistentes, incompletas o con incertidumbre.
+\item Que no pueden ser resueltos aplicando algoritmos clásicos o la investigación operativa.
+\item Se dispone de fuentes de conocimiento.
+\end{enumerate}
+
+\subsection{Ventajas}
+\begin{enumerate}
+\item \textbf{Disponibilidad}: El SBC está disponible para cualquier hardware de cómputo adecuado y coste reducido.
+\item \textbf{Permanencia}: El SBC funciona permanentemente
+\item \textbf{Experiencia múltiple}: El conocimiento de varios especialistas puede estar disponible para trabajar simultánea y continuamente en un problema. Además el nivel de experiencia combinada de muchos SBC puede exceder el de un solo especialista humano.
+\item \textbf{Respuestas no subjetivas}: Un SBC ofrece respuestas sólidas, completas y sin emociones en todo momento.
+\item \textbf{Explicación del razonamiento}: Un SBC puede explicar clara y detalladamente el razonamiento que conduce a una conclusión.
+\item \textbf{Adaptable y mejorable sin necesidad de IC}: Sólo hay que modificar el conocimiento que es algo editable por cualquier usuario.
+\end{enumerate}
+
+\section{Ingeniería del conocimiento}
+Proceso de adquirir, estructurar, formalizar y hacer operativos un conjunto de conocimientos en un programa (SBC) que resuelva una tarea compleja adecuadamente.
+Es importante por las siguientes tres causas:
+\begin{enumerate}
+\item El conocimiento tiene valor por sí mismo y sobrevive a implementaciones.
+\item Los errores en el conocimiento son decisivos.
+\item Facilita escalabilidad y mantenimiento.
+\end{enumerate}
+
+\subsection{Problemas abordados por la IC}
+\begin{enumerate}
+\item La \textbf{adquisición del conocimiento} y cómo \textit{almacenar} el conocimiento humano mediante una representación abstracta efectiva.
+\item La \textbf{representación del conocimiento} en términos de una estructura de datos que una máquina pueda procesar.
+\item Los \textbf{sistemas de razonamiento} o cómo hacer uso de esas estructuras abstractas para generar información útil en el contexto de un caso específico.
+\end{enumerate}
+
+\subsection{Tareas del Ingenieros del Conocimiento}
+Extraer conocimiento del experto, formalizarlo y traducirlo a algún lenguaje que sea capaz de utilizar ese conocimiento y meterlo en un fichero de texto que otra persona sea capaz de entender y modificar.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{img1}
+\caption{Actores del desarrollo de un  SBC} \label{fig:img1}
+\end{figure}
+
+Los algoritmos de inferencia son altamente independientes del problema, pero dependientes del formalismo de representación del conocimiento.\\
+La Base de Conocimiento suele ser totalmente dependiente del problema:
+\begin{enumerate}
+\item Investigar el dominio del problema.
+\item Aprender qué conceptos son importantes en tal dominio.
+\item Obtener una representación formal de tales conceptos, y cómo se relacionan.
+\item Decidir un formalismo de representación.
+\item Reutilizar conocimiento.
+\end{enumerate}
+
+\subsection{Dificultades para el desarrollo de un SBC}
+El conocimiento utiliza variables complejas (a veces más que el resto del problema) y además es difícil de representar. Por otro lado, adquirir conocimiento es un proceso arduo y difícil (suele estar incompleto, presupuesto o inconsistente) y el sistema de inferencia no reproduce lo que se espera.\\
+
+\textbf{Problemas a evitar:}
+\begin{enumerate}
+\item Ingeniero del conocimiento se mete a experto.
+\item Experto se mete a ingeniero del conocimiento.
+\item Experto no entiende bien el objetivo (cree que el IC es un programador a su servicio).
+\item IC cambia SBC por algoritmo.
+\end{enumerate}
+
+\subsection{Ciclo de vida tradicional para el desarrollo de una BC}
+\begin{enumerate}
+\item Identificar la tarea, análisis de viabilidad e impacto.
+\item Adquirir conocimiento (con experto y consultas de documentación).
+\item Conceptualizar: estructurar conocimiento en conceptos y tareas, crear una ontología del dominio (modelo conceptual).
+\item Formalizar el conocimiento general acerca del dominio (modelo formal).
+\item Implementar formalización (con desarrollador).
+\item Verificar y validar funcionamiento esperado (con usuario y experto).
+\end{enumerate}
+
+\section{Relación con otras asignaturas de la rama}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{img2}
+\caption{Relación con otras asignaturas} \label{fig:img2}
+\end{figure}
+
+\end{document}
