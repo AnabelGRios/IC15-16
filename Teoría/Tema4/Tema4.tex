@@ -1,0 +1,201 @@
+\documentclass[12pt]{article}
+
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,activeacute]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{enumerate}
+\usepackage{amsthm}
+\usepackage{float}
+\usepackage{anysize}
+
+\marginsize{2cm}{2cm}{2cm}{2cm}
+
+\title{Tema 4: Sistemas de representación estructurados}
+\author{Anabel G\'omez R\'ios}
+
+
+\begin{document}
+\maketitle
+
+\section{Introducción}
+Son una representación del conocimiento mediante grafos (conceptos, relaciones). Facilitan la representación del conocimiento humano y hay dos tipos: redes semánticas y frames.
+
+\section{Redes Semánticas}
+Las redes semánticas (introducidas por R. Quillian, 1968) son una representación en procesamiento de lenguaje natural. Son un formalismo muy limitado para dominios más complejos y limitado para tratar con formas de inferencia sofisticada. Fueron las precursoras de los frames.\\
+
+Una red semántica se representa como un grafo dirigido etiquetado (en algunos cosas se exige que dicho grafo sea acíclico), constituido por \textbf{nodos}, que representan conceptos (un objeto individual o una clase de objetos) y \textbf{arcos}, que representan relaciones binarias entre los conceptos.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{ejemplo1}
+\caption{Ejemplo básico de red semántica} \label{fig:ejemplo1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{ejemplo2}
+\caption{Ejemplo de red semántica} \label{fig:ejemplo2}
+\end{figure}
+
+\subsection{Herencia en Redes Semánticas}
+La herencia es el mecanismo de razonamiento utilizado en redes semánticas. Un concepto (nodo) hereda las propiedades de los conceptos \textit{más altos en jerarquía} a través de las relaciones subclase-de e instancia-de.\\
+Ejemplo:
+\begin{enumerate}
+\item Un vaso sanguíneo es parte del sistema cardiovascular.
+\item Las arterias contienen sangre rica en oxígeno.
+\item Las arterias tienen pared muscular.
+\item La arteria pulmonar izquierda es una arteria grande.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth, height=8cm,keepaspectratio]{ejemplo3}
+\caption{Ejemplo de red semántica con herencia} \label{fig:ejemplo3}
+\end{figure}
+
+A partir de la red semántica podemos deducir:
+\begin{enumerate}
+\item Las arterias grandes son ricas en oxígeno.
+\item Las arterias grandes tienen pared muscular
+\item La aorta contiene sangre rica en oxígeno.
+\item La aorta tiene pared muscular.
+\end{enumerate}
+
+\subsection{Excepciones en la Herencia}
+\begin{enumerate}
+\item[a)] No heredar propiedades que producen inconsistencias. Por ejemplo en el ejemplo anterior, \textit{La arteria pulmonar izquierda contiene sangre pobre en oxígeno} y \textit{La arteria pulmonar izquierda tiene pared muscular y es rica en oxígeno}. La propiedad \textit{Las arterias transportan sangre rica en oxígeno} no debe ser heredada (excepción) por la arteria pulmonar izquierda.\\
+Una posible solución es almacenar la propiedad como información explícita en cada concepto en el que se cumple la propiedad, eliminando la propiedad general.
+\item[b)] No heredar propiedades que consideramos relevantes para una clase, pero no para sus especializaciones, como por ejemplo \textit{Existen 100 arterias}.
+\end{enumerate}
+\section{Redes Semánticas Extendidas}
+Las redes semánticas extendidas (A. Deliyanni y R. A. Kowalski) son un formalismo de representación alternativo a la forma clausal de la lógica con la restricción de sólo poder utilizar símbolos de predicado binarios. Debido a la equivalencia sintáctica entre redes semánticas extendidas y la forma clausal de la lógica, las reglas de inferencia definidas para la forma clausal de la lógica pueden ser aplicadas para manipular arcos y nodos de una red semántica extendida.\\
+
+Un predicado binario puede ser traducido en una red en la que los nodos representan términos y el arco representa la relación (predicado)
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.3\textwidth]{ejemplo4}
+\caption{Ejemplo de red semántica extendida} \label{fig:ejemplo4}
+\end{figure}
+
+La restricción a símbolos de predicado binarios no es crítica, ya que cualquier átomo que contenga un símbolo de predicado n-ario puede ser reemplazado por una conjunción de átomos que contengan sólo símbolos de predicado binarios.
+\begin{enumerate}
+\item[·] Si n>2, se requieren n+1 nuevos predicados.
+\item[·] Si n=1, sólo se requiere un nuevo predicado
+\end{enumerate}
+\subsection{Ejemplos Redes Semánticas}
+\subsubsection{Ejemplo 1: Traducción predicado terciario a binario}
+\texttt{PresiónSangre(x,y,z)} = "la presión sanguínea de x varía entre y mmHg y z mmHg".\\
+El predicado \texttt{PresiónSangre(arteria, 40, 80)} puede ser reemplazado por la conjunción de predicados binarios:\\
+\texttt{instancia-de(presión1, presiónsangre)}\\
+\texttt{sujeto(presión1, arteria)}\\
+\texttt{Límiteinferior(presión1, 40)}\\
+\texttt{Límitesuperior(presión1, 80)}\\
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{ejemplo5}
+\caption{Ejemplo de red semántica extendida} \label{fig:ejemplo5}
+\end{figure}
+
+\subsubsection{Ejemplo 2: Traducción predicado unario a binario}
+Supongamos el siguiente predicado unario \texttt{Arteria(x) = "x es una arteria"} y las cláusulas \texttt{Arteria(aorta)} y \texttt{Arteria(arteria-grande)}. Estas cláusulas pueden ser reemplazadas por las cláusulas \texttt{instancia-de(aorta, arteria)} y \texttt{subclase-de(arteria-grande, arteria)}
+
+\subsubsection{Ejercicio}
+Representar mediante redes semánticas la siguiente información:\\
+Una persona tiene dos brazos y dos piernas.\\
+Las personas pueden ser hombres y mujeres.\\
+Un jugador de baloncesto es un hombre.\\
+Michael Jordan es un jugador de baloncesto y juega de escolta.\\
+Shaquille O\'\ Neil es un jugador de baloncesto y juega de pivot.\\
+La media de puntos de un escolta es 20.\\
+La media de puntos de Jordan es 20.\\
+La media de puntos de un pivot es 20.\\
+El peso de un jugador de baloncesto es 120 kilos.\\
+ordan pertenece al equipo de los Bulls.\\
+O\'\ Neil pertenece al equipo de los Lakers.\\
+
+\section{Frames}
+Los frames (introducidos por Minsky en 1975) se basan en el concepto de considerar la resolución de problemas humana como el proceso de rellenar huecos de descripciones parcialmente realizadas (O. Selz).\\
+La idea subyacente en un sistema basado en frames es que el conocimiento concerniente a individuos o clases de individuos, incluyendo las relaciones entre los mismos, es almacenada en una entidad compleja de representación llamada frame (unidad, objeto, concepto).\\
+Un conjunto de frames que representan el conocimiento de un dominio de interés es organizada jerárquicamente en lo que es llamado una taxonomía (asociada a un método de razonamiento automático llamado herencia).\\
+
+El conocimiento relevante de un concepto (objeto individual o clase de objetos) es representado mediante entidad compleja de representación llamada frame, constituida por un conjunto de propiedades (atributos). Los frames proporcionan un formalismo para agrupar explícitamente todo el conocimiento concerniente a las propiedades de objetos individuales o clases de objetos.\\
+
+Tipos de frames:
+\begin{enumerate}
+\item Frames clase, o frames genéricos, que representan conocimiento de clases de objetos.
+\item Frames instancia, que representan conocimientos de objetos individuales
+\end{enumerate}
+
+\subsection{Jerarquía o taxonomía de frames}
+El conocimiento de un dominio de interés es organizado jerárquicamente en una jerarquía o taxonomía de frames. La taxonomía es representada mediante un grafo dirigido acíclico (generalmente un árbol) en el que \textbf{śolo} se dan las relación de instancia-de y de subclase-de, y cada nodo denota un frame.\\
+La raíz del árbol es la descripción más general del dominio y las hojas del árbol descripciones de conceptos más específicos.\\
+Las especializaciones (instancias, subclases, subframes) se representan como descendientes de un frame en la taxonomía. No se pueden definir especializaciones de los frames instancia (con excepción de las metaclases). Las generalizaciones (superclases, superframes) se representan como antecesores de un frame en la taxonomía.\\
+
+Las propiedades de los frame más generales son heredadas por sus especializaciones (herencia).
+
+\subsection{Definición de frame}
+Cada frame de una taxonomía tiene un nombre único. Un frame sólo puede tener una superclase (herencia simple). La información (propiedades) específica al concepto representado por un frame es representada mediante atributos o slots. Los atributos ofrecen un medio de representar las propiedades de objetos individuales o clases de objetos.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.3\textwidth]{ejemplo6}
+\caption{Definición de frame} \label{fig:ejemplo6}
+\end{figure}
+
+\subsubsection{Sintaxis de frames}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{ejemplo7}
+\caption{Sintaxis de un frame} \label{fig:ejemplo7}
+\end{figure}
+
+El símbolo nil denota que un frame es la raíz de la taxonomía. $<$conjunto$>$ denotará un conjunto enumerado de constantes elementales y/o nombres de instancias. Se asume que un par atributo/tipo o atributo/valor ocurre una única vez en una taxonomía (posteriormente se elimina esta suposición).
+
+\subsubsection{Ejemplo}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{ejemplo8}
+\caption{Ejemplo de frame} \label{fig:ejemplo8}
+\end{figure}
+
+La información especificada en las partes atributo de los frames instancia sigue las siguientes reglas:
+\begin{enumerate}
+\item Todos los atributos que ocurren en las instancias de un frame clase deben haber sido declarados en dicha frame clase o en una de sus generalizaciones.
+\item Los valores asignados a los atributos de la instancia deben ser del tipo de datos definido en alguna de sus generalizaciones.
+\end{enumerate}
+
+En la declaración de un frame clase también se puede asignar valor a un atributo (están permitidos los pares atributo/valor).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{ejemplo9}
+\caption{Ejemplo de frame} \label{fig:ejemplo9}
+\end{figure}
+
+\subsection{Equivalencia frames / redes semánticas}
+clases, instancias y valores atributos = conceptos (nodos)\\
+atributos = relaciones (arcos)
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{ejemplo10}
+\caption{Equivalencia con redes semánticas}
+\label{fig:ejemplo10}
+\end{figure}
+
+\subsection{Herencia simple}
+
+
+\subsection{Extensión de la definición de Frame}
+
+
+\subsection{Herencia múltiple}
+
+
+\subsection{Ejemplo Frames}
+
+
+\end{document}
