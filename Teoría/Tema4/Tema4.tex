@@ -187,10 +187,54 @@ atributos = relaciones (arcos)
 \end{figure}
 
 \subsection{Herencia simple}
+Herencia simple: frames con una única superclase, taxonomías de tipo árbol. Herencia múltiple: frame con más de una superclase, taxonomías de tipo grafo. Tipos de información sobre atributos en una taxonomía de frames: información sobre tipo de atributo e información sobre valor de atributo. Los enlaces instancia-de y subclase-de definen una ordenación parcial de fames clase de la taxonomía, que puede ser utilizado para razonar sobre los valores de los atributos de la misma forma que en las redes semánticas (las especializaciones 'heredan' los valores de los atributos de las generalizaciones). El enlace subclase-de puede ser considerado como una relación que restringe los contenidos semánticos en la taxonomía de frames (los valores de un atributo de una subclase están restringidos por el tipo de atributo especificado en la superclase).
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{ejemplo11}
+\caption{Herencia}
+\label{fig:ejemplo11}
+\end{figure}
+
+La herencia simple consiste en que un frame hereda todos los atributos de sus superclases, así como los valores de estos atributos.\\
+Consideremos lo siguiente desde un punto de vista de la lógica de preidcados de primer orden: \{arteria(aorta), $\forall$x (arteria(x) $\rightarrow$ pared(x) = muscular)\}. Aplicando el Modus Ponens  obtenemos: pared(aorta) = muscular. De forma similar derivaríamos: vasos-sanguíneos(aorta). Esta información es heredada por la 'aorta' desde una información general de las arterias.\\
+Este tipo de razonamiento es modelado en un método de inferencia para frames llamado \textit{herencia simple}. Informalmente podemos definir el procedimiento de herencia simple de la siguiente forma: Recorrer la taxonomía desde un frame específico hasta la raíz de la misma y coleccionar sucesivamente los atributos de los frames encontrados y sus valores asociados.
+
+\subsubsection{Excepciones de la herencia simple}
+Unicidad atributos en taxonomía disminuye expresividad.\\
+Asumiremos atributos mono-valor.\\
+Un atributo puede ocurrir en más de un frame.\\
+Solución: concepto de \textit{excepción} (propiedad general que no se cumple para algún/os objeto/s del dominio): Si en una especificación de una subclase o instancia, se especifica un valor de un atributo que ha sido especificado también en una generalización de la misma, se mantiene dicho valor y no se hereda el valor especificado en las generalizaciones (los descendientes de este nuevo frame heredarán un nuevo valor especificado como excepción).
 
 \subsection{Extensión de la definición de Frame}
+El formalismo de frames descrito no permite saber si el valor del atributo de una instancia ha sido heredado o ha sido especificado explícitamente ni permite calcular los valores de un atributo a partir de los valores de otros atributos.\\
+Muchos lenguajes de frames proporcionan constructores especiales del lenguaje llamados facetas, que permiten manejar las funcionalidades anteriores.
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{ejemplo12}
+\caption{Extensión de frame}
+\label{fig:ejemplo12}
+\end{figure}
+
+Una faceta es considerada como una propiedad asociada a un atributo.
+\begin{enumerate}
+\item \textbf{faceta valor}, es la más común y referencia el valor real del atributo.
+\item \textbf{faceta valor por defecto}, denota el valor inicial del atributo en caso de que no se especifique lo contrario.
+\item \textbf{faceta tipo valor}, especifica el tipo de dato del valor del atributo.
+\item \textbf{faceta cardinalidad}, especifica si se trata de un atributo uni o multi-valuado.
+\item \textbf{faceta máxima cardinalidad}, sólo es válida para atributos multi-valuados y especifica el máximo número de valores asociados al atributo.
+\item \textbf{facetas demonio}, permiten la integración de conocimiento declarativo y procedural. Un demonio o valor activo es un procedimiento que es invocado en un momento determinado durante la manipulación del atributo donde ha sido especificado (si-necesario, si-añadido, si-eliminado).
+\item \textbf{faceta tipo atributo}, especifica si se trata de un atributo heredable o no heredable.
+\item  \textbf{faceta herencia}, especifica el tipo de herencia del atributo.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{ejemplo13}
+\caption{Sintaxis de frames}
+\label{fig:ejemplo13}
+\end{figure}
 
 \subsection{Herencia múltiple}
 
