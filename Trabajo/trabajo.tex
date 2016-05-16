@@ -6,6 +6,10 @@
 \usepackage{tikz}
 \usepackage{amsthm}
 \usepackage{amssymb}
+\usepackage{float}
+\usepackage{anysize}
+
+\marginsize{2cm}{2cm}{2cm}{2cm}
 
 \title{Sistemas expertos probabilísticos}
 \author{Anabel Gómez Ríos\\
@@ -22,7 +26,7 @@ En clase hemos visto sistemas expertos basados en reglas del tipo \textbf{SI} \t
 Este tipo de sistemas son muy útiles y muy utilizados por su simplicidad y el parecido con el razonamiento humano, pero presentan varios inconvenientes:
 \begin{enumerate}
     \item Mantener la coherencia entre las reglas de la base de conocimiento. Pueden aparecer dos tipos de problemas: encadenamientos infinitos, cuando aparecen reglas del tipo \textit{Si A entonces B} junto con \textit{Si B entonces A} y problemas de ampliación en la base de conocimiento cuando hay que realizar una actualización y para mantener la coherencia la base de datos se hace innecesariamente grande, llegando incluso a ser mejor reconstruirla de nuevo.
-    \item Dificultades para retractarse de anteriores conclusiones, provocado principalmente por el carácter modular y monótono de estos sistemas, ya que cuando se cumple la condición de una regla, se da la acción sin tener en cuenta el resto del conocimiento. 
+    \item Dificultades para retractarse de anteriores conclusiones, provocado principalmente por el carácter modular y monótono de estos sistemas, ya que cuando se cumple la condición de una regla, se da la acción sin tener en cuenta el resto del conocimiento.
     \item Opacidad: Al tener que dividir el conocimiento en pequeñas reglas, se pierde perspectiva global del problema tratado.
     \item Ineficiencia provocada por la continua comprobación de las reglas en cada iteración.
 \end{enumerate}
@@ -30,7 +34,7 @@ Este tipo de sistemas son muy útiles y muy utilizados por su simplicidad y el p
 Sin embargo el principal problema es que cuando se trabaja con problemas reales y conocimiento humano en la mayoría de los casos hay inherente incertidumbre bien en el conocimiento, es decir, en cómo se ha obtenido el conocimiento, o bien en el conjunto de datos, es decir, si los datos no se han determinado de forma precisa o faltan datos.\\
 Normalmente, las evidencias que tenemos sobre un hecho no nos permiten deducir con seguridad las conclusiones o la negación de las mismas, pero sí nos permiten dar mayor credibilidad a una sentencia. Por esto, si queremos diseñar un sistema experto capaz de obtener las mismas conclusiones que un experto humano, tenemos darle la capacidad de trabajar con incertidumbre.
 
-\section{Ejemplo de sistema experto Probabilístico:\\ MYCIN}
+\section{Ejemplo de sistema experto Probabilístico: MYCIN}
 MYCIN fue el primer sistema experto que consideró conocimiento incierto. En este sistema, una regla \textbf{Si} A \textbf{Entonces} B se representaba $A \overset{m}{\rightarrow}B$, expresando que si se conoce $A$, entonces se puede actualizar la certeza de $B$ en cierta cantidad, en función de la fuerza de la regla, $m$. El valor $m$ se denomina factor de certeza de la regla y toma valores en el intervalo $[-1,1]$.\\
 
 Supongamos el siguiente ejemplo:
@@ -68,9 +72,63 @@ En los sistemas expertos basados en reglas, el aprendizaje consiste en incorpora
 \section{Teoría de la Probabilidad}
 Vamos a ver algunas nociones básicas de probabilidad que serán de utilidad para trabajar con este tipo de sistemas.
 
-\subsection{Probabilidad de un suceso}
+\subsection{Probabilidad marginal}
+Sean $X_1,X_2,...,X_n$ un conjunto de variables aleatorias que toman valores discretos y sea $\{x_1,x_2,...,x_n\}$ el conjunto de sus posibles realizaciones. Sea $P(x_1,x_2,...,x_n)$ una probabilidad sobre $X_1,X_2,...,X_n$, es decir, $P(x_1,x_2,...,x_n) = P(X_1 = x_1,...,X_n=x_n)$, entonces la distribución de probabilidad marginal sobre la $i$-ésima variables se obtiene mediante
+\[	P(x_i) = P(X_i=x_i) = \sum_{x_1,...,x_{i-1},x_{i+1},...,x_n}P(x_1,...,x_n)	\]
 
+\subsection{Probabilidad condicionada}
+Sean $X$ e $Y$ dos conjuntos disjuntos de variables que toman valores en $\{x_1,...,x_n\}$ y $\{y_1,...,y_m\}$. La distribución de probabilidad condicionada de $X$ dado que $Y=y_j$ (con $j \in \{1,...,m\}$ y $P(Y=y_i)>0$) viene dada por
+\[	\forall x_i \in X;\ P(X=x_i|Y=y_i)=P(x_i|y_i)=\frac{P(x_i,y_j)}{P(y_j)}	\]
+Por tanto, la distribución de probabilidad conjunta puede obtenerse como:
+\[	P(x_i,y_i)=P(y_j)P(x_i,y_j)	\]
+La distribución de probabilidad conjunta nos va a permitir actualizar nuestro conocimiento a la luz de nueva información.
 
+\subsection{Independencia probabilística}
+Sean $X$ e $Y$ dos subconjuntos disjuntos del conjunto de variables aleatorias $\{X_1,...,X_n\}$. Se dice que $X$ es \textbf{marginalmente independiente} de $X$ y se nota $I(X,\emptyset,Y)$, si y solamente si para todos los posibles valores $x$ de $X$ e $y$ de $Y$ se satisface que $P(x|y)=P(x)$.\\
+En caso contrario, se dice que $X$ es marginalmente dependiente de $Y$, y se denota $\neg I(X,\emptyset,Y)$.\\
+
+Sean $X, Y$ y $Z$ tres conjuntos disjuntos de variables. Se dice que $X$ es \textbf{condicionalmente independiente} de $Y$ dado que conocemos $Z$, y lo notamos $I(X,Z,Y)$, si y sólo si para todos los valores $x,y,z$ de $X,Y,Z$ (respectivamente) se satisface que $P(x|z,y)=P(x|z)$.\\
+En caso contrario se dice que son condicionalmente dependientes, y lo notamos por $\neg I(X,Z,Y)$.
+
+\subsection{Teorema de Bayes}
+Este teorema nos permite representar la probabilidad condicionada $P(y|x)$ mediante la expresión:
+\[	P(y|x)=\frac{P(x|y)P(y)}{P(x)}	\]
+Si tenemos en cuenta que $P(x) = \sum_{y \in Y}P(x,y)$ y que $P(x,y) = P(x|y)P(y)$ podemos reescribir la anterior expresión:
+\[	P(x|y) = \frac{P(x|y)P(y)}{\sum_{y \in Y} P(x|y)P(y)}	\]
+
+\section{Sistemas Expertos Probabilísticos}
+Son dos los elementos esenciales que caracterizan a un sistema experto: La base de conocimiento y el motor de inferencia. Desde un punto de vista general, en un sistema experto probabilístico la base de conocimiento está formada por un conjunto de variables $X_1,...,X_n$ y una distribución de probabilidad conjunta sobre ellas $P(x_1,...,x_n)$. Por otro lado, un motor de inferencia básico sará aquel que nos permita actualizar nuestra información sobre una determinada variable (o conjunto de ellas), $X$, ante la presencia de un conjunto de hechos, evidencias o síntomas determinados, $E$. En teoría de la probabilidad este motor de inferencia no es más que el cálculo de la probabilidad condicional $P(X|E)$.\\
+Si tratamos de realizar una aproximación directa, en la que representamos la distribución de probabilidad conjunta con una tabla, pronto nos damos cuenta de que, incluso en problemas con un conjunto pequeño de variables, el problema es intratable. Sin embargo, son muchas las aplicaciones prácticas en las que conocemos \textit{a priori} que, por ejemplo, dos variables son (marginal o condicionalmente) independientes. En estos casos, podemos utilizar dicha información con el objetivo de reducir el espacio necesario para almacenar la distribución de probabilidad conjunta. La idea es dividir o factorizar dicha distribución en un conjunto de distribuciones más pequeñas que tengan la misma representatividad. En cualquier caso, es necesario proporcionar un método que permita recuperar los valores originales de la distribución de probabilidad conjunta.\\
+La idea básica es codificar el conocimiento de tal manera que no sea necesario el utilizar información que sea irrelevante y, por otro lado, la información relevante sea fácilmente accesible. Podemos encontrar distintos modelos para implementar esta idea, entre los que se encuentran las redes de Markov y las redes Bayesianas. Ambos sistemas se apoyan en modelos gráficos para representar de forma explícita las relaciones de dependencia e independencia entre las variables.
+
+\section{Redes de Markov}
+Las redes de Markov se representan gráficamente mediante grafos no dirigidos, donde los nodos representan las variables y una relación de dependencia entre dos variables se representa mediante la existencia de un camino o conexión entre ellas. Por otra parte, en estos modelos también se representan las relaciones de independencia. En concreto, si $X,Y$ y $Z$ son conjuntos disjuntos de variables, entonces:
+\begin{enumerate}
+\item Una independencia marginal viene representada por la inexistencia de conexión entre las variables de $X$ e $Y$.
+\item Una relación de independencia condicionada del tipo $I(X,Z,Y)$ se representa por el hecho de que todo camino que conecta las variables de $X$ con variables de $Y$ contiene algún nodo de $Z$. Por tanto, si los nodos en $Z$ son borrados del grafo, las variables $X$ e $Y$ quedan desconectadas.\\
+De esta forma, somos capaces de determinar cuándo dos variables son dependientes o no. Pero, ¿puede el modelo gráfico representar todas las relaciones de dependencia / independencia que se derivan de una distribución de probabilidad conjunta?\\
+La respuesta a esta pregunta es que no. Supongamos el siguiente ejemplo:
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.3\textwidth]{ejemplo}
+\caption{Ejemplo} \label{fig:ejemplo}
+\end{figure}
+
+De aquí podemos deducir varias cosas:
+\begin{enumerate}
+\item Como $P(x|y)=\frac{P(x,y)}{P(y)} = \frac{0.245+0.105}{0.03+0.12+0.245+0.105} = \frac{0.35}{0.5} = 0.7$ y $P(x)=0.21+0.14+0.245+0.105 = 0.7$ tenemos que $P(x|y)=P(x)$ y por tanto $X$ es independiente marginalmente a $Y \Rightarrow$ no exite un camino que conecte $X$ con $Y$.
+\item De forma análoga se puede comprobar que $P(x|z)\neq P(x)$ y por tanto existe un camino que conecta $X$ y $Z$ e igualmente con $Z$ e $Y$
+\end{enumerate}
+
+Nos queda por tanto el siguiente grafo:
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.2\textwidth]{grafo}
+\caption{Grafo deducido} \label{fig:grafo}
+\end{figure}
+
+De aquí podemos deducir que existe un camino que conecta $X$ con $Y$, el que pasa por $Z$, en contra de lo primera deducción. Las redes de Markov por tanto no son capaces de representar relaciones de independencia no transitivas. Una herramienta para diseñar sistemas expertos probabilísticos utilizando el formalismo más potente de los grafos dirigidos para representar las relaciones entre las variables son las redes bayesianas, que veremos a continuación.
+\end{enumerate}
 
 \section{Redes bayesianas}
 
@@ -79,7 +137,7 @@ Las redes bayesianas son uno de los modelos con más importancia en los sistemas
 \begin{enumerate}
 \item \textbf{Cualitativo}: Relaciones de dependencia e independencia entre variables. Dos variables conectadas por un arco estarán relacionadas.
 \item \textbf{Cuantitativo}: Fuerza con la que nos creemos las relaciones de relevancia o dependencia.
-\end{enumerate} 
+\end{enumerate}
 
 Usaremos la representación mediante grafos para representar la dependencia, por
 
@@ -97,8 +155,6 @@ Usaremos la representación mediante grafos para representar la dependencia, por
 
 \end{tikzpicture}
 \end{center}
-
-\section{Cadenas de Markov}
 
 \section{Métodos de propagación}
 
