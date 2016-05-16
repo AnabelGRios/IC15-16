@@ -4,6 +4,7 @@
 \usepackage{enumerate}
 \usepackage{amsthm}
 \usepackage{amssymb}
+\usepackage{float}
 \usepackage{anysize}
 
 \marginsize{2cm}{2cm}{2cm}{2cm}
@@ -92,9 +93,41 @@ Este teorema nos permite representar la probabilidad condicionada $P(y|x)$ media
 Si tenemos en cuenta que $P(x) = \sum_{y \in Y}P(x,y)$ y que $P(x,y) = P(x|y)P(y)$ podemos reescribir la anterior expresión:
 \[	P(x|y) = \frac{P(x|y)P(y)}{\sum_{y \in Y} P(x|y)P(y)}	\]
 
-\section{Redes bayesianas}
+\section{Sistemas Expertos Probabilísticos}
+Son dos los elementos esenciales que caracterizan a un sistema experto: La base de conocimiento y el motor de inferencia. Desde un punto de vista general, en un sistema experto probabilístico la base de conocimiento está formada por un conjunto de variables $X_1,...,X_n$ y una distribución de probabilidad conjunta sobre ellas $P(x_1,...,x_n)$. Por otro lado, un motor de inferencia básico sará aquel que nos permita actualizar nuestra información sobre una determinada variable (o conjunto de ellas), $X$, ante la presencia de un conjunto de hechos, evidencias o síntomas determinados, $E$. En teoría de la probabilidad este motor de inferencia no es más que el cálculo de la probabilidad condicional $P(X|E)$.\\
+Si tratamos de realizar una aproximación directa, en la que representamos la distribución de probabilidad conjunta con una tabla, pronto nos damos cuenta de que, incluso en problemas con un conjunto pequeño de variables, el problema es intratable. Sin embargo, son muchas las aplicaciones prácticas en las que conocemos \textit{a priori} que, por ejemplo, dos variables son (marginal o condicionalmente) independientes. En estos casos, podemos utilizar dicha información con el objetivo de reducir el espacio necesario para almacenar la distribución de probabilidad conjunta. La idea es dividir o factorizar dicha distribución en un conjunto de distribuciones más pequeñas que tengan la misma representatividad. En cualquier caso, es necesario proporcionar un método que permita recuperar los valores originales de la distribución de probabilidad conjunta.\\
+La idea básica es codificar el conocimiento de tal manera que no sea necesario el utilizar información que sea irrelevante y, por otro lado, la información relevante sea fácilmente accesible. Podemos encontrar distintos modelos para implementar esta idea, entre los que se encuentran las redes de Markov y las redes Bayesianas. Ambos sistemas se apoyan en modelos gráficos para representar de forma explícita las relaciones de dependencia e independencia entre las variables.
 
-\section{Cadenas de Markov}
+\section{Redes de Markov}
+Las redes de Markov se representan gráficamente mediante grafos no dirigidos, donde los nodos representan las variables y una relación de dependencia entre dos variables se representa mediante la existencia de un camino o conexión entre ellas. Por otra parte, en estos modelos también se representan las relaciones de independencia. En concreto, si $X,Y$ y $Z$ son conjuntos disjuntos de variables, entonces:
+\begin{enumerate}
+\item Una independencia marginal viene representada por la inexistencia de conexión entre las variables de $X$ e $Y$.
+\item Una relación de independencia condicionada del tipo $I(X,Z,Y)$ se representa por el hecho de que todo camino que conecta las variables de $X$ con variables de $Y$ contiene algún nodo de $Z$. Por tanto, si los nodos en $Z$ son borrados del grafo, las variables $X$ e $Y$ quedan desconectadas.\\
+De esta forma, somos capaces de determinar cuándo dos variables son dependientes o no. Pero, ¿puede el modelo gráfico representar todas las relaciones de dependencia / independencia que se derivan de una distribución de probabilidad conjunta?\\
+La respuesta a esta pregunta es que no. Supongamos el siguiente ejemplo:
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.3\textwidth]{ejemplo}
+\caption{Ejemplo} \label{fig:ejemplo}
+\end{figure}
+
+De aquí podemos deducir varias cosas:
+\begin{enumerate}
+\item Como $P(x|y)=\frac{P(x,y)}{P(y)} = \frac{0.245+0.105}{0.03+0.12+0.245+0.105} = \frac{0.35}{0.5} = 0.7$ y $P(x)=0.21+0.14+0.245+0.105 = 0.7$ tenemos que $P(x|y)=P(x)$ y por tanto $X$ es independiente marginalmente a $Y \Rightarrow$ no exite un camino que conecte $X$ con $Y$.
+\item De forma análoga se puede comprobar que $P(x|z)\neq P(x)$ y por tanto existe un camino que conecta $X$ y $Z$ e igualmente con $Z$ e $Y$
+\end{enumerate}
+
+Nos queda por tanto el siguiente grafo:
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.2\textwidth]{grafo}
+\caption{Grafo deducido} \label{fig:grafo}
+\end{figure}
+
+De aquí podemos deducir que existe un camino que conecta $X$ con $Y$, el que pasa por $Z$, en contra de lo primera deducción. Las redes de Markov por tanto no son capaces de representar relaciones de independencia no transitivas. Una herramienta para diseñar sistemas expertos probabilísticos utilizando el formalismo más potente de los grafos dirigidos para representar las relaciones entre las variables son las redes bayesianas, que veremos a continuación.
+\end{enumerate}
+
+\section{Redes bayesianas}
 
 \section{Métodos de propagación}
 
