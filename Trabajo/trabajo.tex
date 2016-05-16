@@ -4,6 +4,9 @@
 \usepackage{enumerate}
 \usepackage{amsthm}
 \usepackage{amssymb}
+\usepackage{anysize}
+
+\marginsize{2cm}{2cm}{2cm}{2cm}
 
 \title{Sistemas expertos probabilísticos}
 \author{Anabel Gómez Ríos\\
@@ -28,7 +31,7 @@ Este tipo de sistemas son muy útiles y muy utilizados por su simplicidad y el p
 Sin embargo el principal problema es que cuando se trabaja con problemas reales y conocimiento humano en la mayoría de los casos hay inherente incertidumbre bien en el conocimiento, es decir, en cómo se ha obtenido el conocimiento, o bien en el conjunto de datos, es decir, si los datos no se han determinado de forma precisa o faltan datos.\\
 Normalmente, las evidencias que tenemos sobre un hecho no nos permiten deducir con seguridad las conclusiones o la negación de las mismas, pero sí nos permiten dar mayor credibilidad a una sentencia. Por esto, si queremos diseñar un sistema experto capaz de obtener las mismas conclusiones que un experto humano, tenemos darle la capacidad de trabajar con incertidumbre.
 
-\section{Ejemplo de sistema experto Probabilístico:\\ MYCIN}
+\section{Ejemplo de sistema experto Probabilístico: MYCIN}
 MYCIN fue el primer sistema experto que consideró conocimiento incierto. En este sistema, una regla \textbf{Si} A \textbf{Entonces} B se representaba $A \overset{m}{\rightarrow}B$, expresando que si se conoce $A$, entonces se puede actualizar la certeza de $B$ en cierta cantidad, en función de la fuerza de la regla, $m$. El valor $m$ se denomina factor de certeza de la regla y toma valores en el intervalo $[-1,1]$.\\
 
 Supongamos el siguiente ejemplo:
@@ -65,9 +68,29 @@ En los sistemas expertos basados en reglas, el aprendizaje consiste en incorpora
 
 \section{Teoría de la Probabilidad}
 Vamos a ver algunas nociones básicas de probabilidad que serán de utilidad para trabajar con este tipo de sistemas.
-\subsection{Probabilidad de un suceso}
+\subsection{Probabilidad marginal}
+Sean $X_1,X_2,...,X_n$ un conjunto de variables aleatorias que toman valores discretos y sea $\{x_1,x_2,...,x_n\}$ el conjunto de sus posibles realizaciones. Sea $P(x_1,x_2,...,x_n)$ una probabilidad sobre $X_1,X_2,...,X_n$, es decir, $P(x_1,x_2,...,x_n) = P(X_1 = x_1,...,X_n=x_n)$, entonces la distribución de probabilidad marginal sobre la $i$-ésima variables se obtiene mediante
+\[	P(x_i) = P(X_i=x_i) = \sum_{x_1,...,x_{i-1},x_{i+1},...,x_n}P(x_1,...,x_n)	\]
 
+\subsection{Probabilidad condicionada}
+Sean $X$ e $Y$ dos conjuntos disjuntos de variables que toman valores en $\{x_1,...,x_n\}$ y $\{y_1,...,y_m\}$. La distribución de probabilidad condicionada de $X$ dado que $Y=y_j$ (con $j \in \{1,...,m\}$ y $P(Y=y_i)>0$) viene dada por
+\[	\forall x_i \in X;\ P(X=x_i|Y=y_i)=P(x_i|y_i)=\frac{P(x_i,y_j)}{P(y_j)}	\]
+Por tanto, la distribución de probabilidad conjunta puede obtenerse como:
+\[	P(x_i,y_i)=P(y_j)P(x_i,y_j)	\]
+La distribución de probabilidad conjunta nos va a permitir actualizar nuestro conocimiento a la luz de nueva información.
 
+\subsection{Independencia probabilística}
+Sean $X$ e $Y$ dos subconjuntos disjuntos del conjunto de variables aleatorias $\{X_1,...,X_n\}$. Se dice que $X$ es \textbf{marginalmente independiente} de $X$ y se nota $I(X,\emptyset,Y)$, si y solamente si para todos los posibles valores $x$ de $X$ e $y$ de $Y$ se satisface que $P(x|y)=P(x)$.\\
+En caso contrario, se dice que $X$ es marginalmente dependiente de $Y$, y se denota $\neg I(X,\emptyset,Y)$.\\
+
+Sean $X, Y$ y $Z$ tres conjuntos disjuntos de variables. Se dice que $X$ es \textbf{condicionalmente independiente} de $Y$ dado que conocemos $Z$, y lo notamos $I(X,Z,Y)$, si y sólo si para todos los valores $x,y,z$ de $X,Y,Z$ (respectivamente) se satisface que $P(x|z,y)=P(x|z)$.\\
+En caso contrario se dice que son condicionalmente dependientes, y lo notamos por $\neg I(X,Z,Y)$.
+
+\subsection{Teorema de Bayes}
+Este teorema nos permite representar la probabilidad condicionada $P(y|x)$ mediante la expresión:
+\[	P(y|x)=\frac{P(x|y)P(y)}{P(x)}	\]
+Si tenemos en cuenta que $P(x) = \sum_{y \in Y}P(x,y)$ y que $P(x,y) = P(x|y)P(y)$ podemos reescribir la anterior expresión:
+\[	P(x|y) = \frac{P(x|y)P(y)}{\sum_{y \in Y} P(x|y)P(y)}	\]
 
 \section{Redes bayesianas}
 
