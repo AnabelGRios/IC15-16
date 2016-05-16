@@ -2,6 +2,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{mathtools}
 \usepackage{enumerate}
+\usepackage{pgfplots}
+\usepackage{tikz}
 \usepackage{amsthm}
 \usepackage{amssymb}
 
@@ -65,11 +67,36 @@ En los sistemas expertos basados en reglas, el aprendizaje consiste en incorpora
 
 \section{Teoría de la Probabilidad}
 Vamos a ver algunas nociones básicas de probabilidad que serán de utilidad para trabajar con este tipo de sistemas.
+
 \subsection{Probabilidad de un suceso}
 
 
 
 \section{Redes bayesianas}
+
+Las redes bayesianas son uno de los modelos con más importancia en los sistemas expertos probabilísticos. Gráficamente consisten en un grafo dirigido acíclico, donde los nodos son variables del problema a resolver. Las redes bayesianas permiten representar dos aspectos del conocimiento:
+
+\begin{enumerate}
+\item \textbf{Cualitativo}: Relaciones de dependencia e independencia entre variables. Dos variables conectadas por un arco estarán relacionadas.
+\item \textbf{Cuantitativo}: Fuerza con la que nos creemos las relaciones de relevancia o dependencia.
+\end{enumerate} 
+
+Usaremos la representación mediante grafos para representar la dependencia, por
+
+\begin{center}
+\begin{tikzpicture}[y=.3cm, x=.3cm,font=\normalsize]
+
+\draw[->] (4,10) edge (0,5);
+
+\filldraw[fill=white!0,draw=black!80] (0,5) circle (10pt) node[] {$P$};
+\filldraw[fill=white!0,draw=black!80] (4,10) circle (10pt) node[] {$TV$};
+\filldraw[fill=white!0,draw=black!80] (8,5) circle (10pt) node[] {$VM$};
+\filldraw[fill=white!0,draw=black!80] (12,10) circle (10pt) node[] {$TC$};
+\filldraw[fill=white!0,draw=black!80] (12,0) circle (10pt) node[] {$D$};
+\filldraw[fill=white!0,draw=black!80] (16,5) circle (10pt) node[] {$K$};
+
+\end{tikzpicture}
+\end{center}
 
 \section{Cadenas de Markov}
 
