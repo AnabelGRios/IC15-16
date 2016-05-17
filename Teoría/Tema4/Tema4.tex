@@ -8,7 +8,9 @@
 \usepackage{enumerate}
 \usepackage{amsthm}
 \usepackage{float}
+\usepackage{subfig}
 \usepackage{anysize}
+\usepackage{wrapfig}
 
 \marginsize{2cm}{2cm}{2cm}{2cm}
 
@@ -71,13 +73,12 @@ Una posible solución es almacenar la propiedad como información explícita en 
 \section{Redes Semánticas Extendidas}
 Las redes semánticas extendidas (A. Deliyanni y R. A. Kowalski) son un formalismo de representación alternativo a la forma clausal de la lógica con la restricción de sólo poder utilizar símbolos de predicado binarios. Debido a la equivalencia sintáctica entre redes semánticas extendidas y la forma clausal de la lógica, las reglas de inferencia definidas para la forma clausal de la lógica pueden ser aplicadas para manipular arcos y nodos de una red semántica extendida.\\
 
-Un predicado binario puede ser traducido en una red en la que los nodos representan términos y el arco representa la relación (predicado)
-
-\begin{figure}[H]
-\centering
+\begin{wrapfigure}{r}{0.3\textwidth}
 \includegraphics[width=0.3\textwidth]{ejemplo4}
 \caption{Ejemplo de red semántica extendida} \label{fig:ejemplo4}
-\end{figure}
+\end{wrapfigure}
+
+Un predicado binario puede ser traducido en una red en la que los nodos representan términos y el arco representa la relación (predicado)
 
 La restricción a símbolos de predicado binarios no es crítica, ya que cualquier átomo que contenga un símbolo de predicado n-ario puede ser reemplazado por una conjunción de átomos que contengan sólo símbolos de predicado binarios.
 \begin{enumerate}
@@ -86,18 +87,18 @@ La restricción a símbolos de predicado binarios no es crítica, ya que cualqui
 \end{enumerate}
 \subsection{Ejemplos Redes Semánticas}
 \subsubsection{Ejemplo 1: Traducción predicado terciario a binario}
+
+\begin{wrapfigure}{r}{0.4\textwidth}
+\includegraphics[width=0.4\textwidth]{ejemplo5}
+\caption{Ejemplo de red semántica extendida} \label{fig:ejemplo5}
+\end{wrapfigure}
+
 \texttt{PresiónSangre(x,y,z)} = "la presión sanguínea de x varía entre y mmHg y z mmHg".\\
 El predicado \texttt{PresiónSangre(arteria, 40, 80)} puede ser reemplazado por la conjunción de predicados binarios:\\
 \texttt{instancia-de(presión1, presiónsangre)}\\
 \texttt{sujeto(presión1, arteria)}\\
 \texttt{Límiteinferior(presión1, 40)}\\
 \texttt{Límitesuperior(presión1, 80)}\\
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.4\textwidth]{ejemplo5}
-\caption{Ejemplo de red semántica extendida} \label{fig:ejemplo5}
-\end{figure}
 
 \subsubsection{Ejemplo 2: Traducción predicado unario a binario}
 Supongamos el siguiente predicado unario \texttt{Arteria(x) = "x es una arteria"} y las cláusulas \texttt{Arteria(aorta)} y \texttt{Arteria(arteria-grande)}. Estas cláusulas pueden ser reemplazadas por las cláusulas \texttt{instancia-de(aorta, arteria)} y \texttt{subclase-de(arteria-grande, arteria)}
@@ -137,14 +138,24 @@ Las especializaciones (instancias, subclases, subframes) se representan como des
 Las propiedades de los frame más generales son heredadas por sus especializaciones (herencia).
 
 \subsection{Definición de frame}
+
+\begin{wrapfigure}{l}{0.25\textwidth}
+\includegraphics[width=0.25\textwidth]{ejemplo6}
+\caption{Definición de frame} \label{fig:ejemplo6}
+\end{wrapfigure}
+
+\ \\
+\ \\
 Cada frame de una taxonomía tiene un nombre único. Un frame sólo puede tener una superclase (herencia simple). La información (propiedades) específica al concepto representado por un frame es representada mediante atributos o slots. Los atributos ofrecen un medio de representar las propiedades de objetos individuales o clases de objetos.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.3\textwidth]{ejemplo6}
-\caption{Definición de frame} \label{fig:ejemplo6}
-\end{figure}
-
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
 \subsubsection{Sintaxis de frames}
 \begin{figure}[H]
 \centering
@@ -191,7 +202,7 @@ Herencia simple: frames con una única superclase, taxonomías de tipo árbol. H
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.5\textwidth]{ejemplo11}
+\includegraphics[width=0.4\textwidth]{ejemplo11}
 \caption{Herencia}
 \label{fig:ejemplo11}
 \end{figure}
@@ -210,12 +221,11 @@ Solución: concepto de \textit{excepción} (propiedad general que no se cumple p
 El formalismo de frames descrito no permite saber si el valor del atributo de una instancia ha sido heredado o ha sido especificado explícitamente ni permite calcular los valores de un atributo a partir de los valores de otros atributos.\\
 Muchos lenguajes de frames proporcionan constructores especiales del lenguaje llamados facetas, que permiten manejar las funcionalidades anteriores.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.4\textwidth]{ejemplo12}
+\begin{wrapfigure}{r}{0.35\textwidth}
+\includegraphics[width=0.35\textwidth]{ejemplo12}
 \caption{Extensión de frame}
 \label{fig:ejemplo12}
-\end{figure}
+\end{wrapfigure}
 
 Una faceta es considerada como una propiedad asociada a un atributo.
 \begin{enumerate}
@@ -236,10 +246,59 @@ Una faceta es considerada como una propiedad asociada a un atributo.
 \label{fig:ejemplo13}
 \end{figure}
 
-\subsection{Herencia múltiple}
+\begin{enumerate}
+\item \textbf{Tipos de herencia de valores}: Dependiendo de cómo se recorre la taxonomía para determinar los valores del atributo considerado:
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{ejemplo14}
+\caption{Tipos de herencia}
+\label{fig:ejemplo14}
+\end{figure}
+\item \textbf{Herencia de tipo de atributos}: Una especialización hereda el tipo de valor de su generalización a no ser que se especifique lo contrario. Excepciones: en la especificación de un frame se puede restringir el tipo de valor de un atributo a un subtipo del tipo de valores de su generalización.
+\end{enumerate}
 
+\subsection{Herencia múltiple}
+Taxonomía representada por un grafo dirigido acíclico. Una especificación hereda los atributos de todas sus generalizaciones (su conjunto de atributos será la unión de los conjuntos de atributos de sus superclases).\\
+Excepciones:
+\begin{enumerate}
+\item Debidas a inconsistencias entre generalizaciones y especializaciones se resuelven mediante herencia simple.
+\item Debidas a inconsistencias entre superclases de una misma especialización, se necesitan métodos para decidir qué valores de facetas heredar de entre los de las superclases.
+\item Explícitas.
+\end{enumerate}
 
 \subsection{Ejemplo Frames}
+Representar mediante un método basado en frames, detallando: clases, subclases e instancias, slots o atributos de los frames (distinguir entre miembros y propios), clase de valores de los atributos y valores de los atributos, para aquellos que sean conocidos.\\
+\textbf{Categoría} $\longrightarrow$ \textbf{Rango de presión media (mmHG)}\\
+Arterias grandes $\longrightarrow$ 90-100\\
+Arterias pequeñas $\longrightarrow$ 80-90\\
+Arteriolas $\longrightarrow$ 40-80\\
+Venas $\longrightarrow$ $<$10\\
+Vena pequeña $\longrightarrow$ $<$10\\
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{ejemplo15}
+\caption{Ejemplo}
+\label{fig:ejemplo15}
+\end{figure}
+
+\begin{figure}[H]
+ \centering
+  \subfloat[]{
+   \label{f:ejemplo15}
+    \includegraphics[width=0.6\textwidth]{ejemplo16}}
+  \subfloat[]{
+   \label{f:ejemplo16}
+    \includegraphics[width=0.4\textwidth]{ejemplo17}}
+ \caption{Ejemplo parte 1}
+ \label{f:ejemplop1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{ejemplo18}
+\caption{Ejemplo parte 2}
+\label{fig:ejemplo18}
+\end{figure}
 
 \end{document}
