@@ -247,7 +247,7 @@ Una faceta es considerada como una propiedad asociada a un atributo.
 \end{figure}
 
 \begin{enumerate}
-\item \textbf{Tipos de herencia de valores}: Dependiendo de cómo se recorre la taxonomía para determinar los valores del atributo considerado:
+\item \textbf{Tipos de herencia de valores}: Dependiendo de cómo se recorre la taxonomía para determinar los valores del atributo considerado. En la N-herencia va antes la herencia que el procedimiento para calcular los valores del atributo y en la Z-herencia va antes el procedimiento para calcular los valores que la herencia:
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{ejemplo14}
@@ -301,4 +301,17 @@ Vena pequeña $\longrightarrow$ $<$10\\
 \label{fig:ejemplo18}
 \end{figure}
 
+\subsubsection{Ejemplo: organización de un congreso}
+Representa mediante una estructura de Frames la siguiente información acerca de la organización de un congreso:
+\begin{enumerate}
+\item En dicho congreso se debe poder almacenar información acerca de las presentaciones que se van a realizar que serán bien artículos aceptados, conferencias invitadas o posters. De cada una de estas presentaciones se desea conocer su títulos, número de referencia, autor/es, su lista de descriptores y si está confirmada su presentación en el congreso.
+\item Se desea también almacenar información de los diferentes autores con datos como nombre, apellidos, universidad o centro donde trabajan y número de artículos presentados.
+\item Por otro lado se debe mantener una lista de las personas inscritas, indicando su nombre, cantidad abonada, número de tarjeta de crédito y si es estudiante o no. En el caso de ser estudiante se deberá guardar información acerca de la universidad donde está estudiando.
+\item Se quiere disponer de una estructura que refleje las sesiones del congreso por días. El congreso dura 3 días (miércoles, jueves y viernes) y hay 3 sesiones diarias (mañana1, mañana2 y tarde1), donde en cada sesión puede haber o bien 3 artículos o 1 conferencia invitada o un número indeterminado de posters (no puede haber mezclas de presentaciones diferentes).
+\item Cada uno de los descriptores del congreso debe asociarse a una descripción del mismo que explique el significado del descriptor.
+\end{enumerate}
+
+\section{Notas finales}
+En este último ejemplo vimos que lo que le falta a los frames para ser una ontología es poder referenciar en un atributo de un frame a otro frame.\\
+Además, hay una cosa que se puede hacer con frames y no con redes semánticas: las restricciones que ponemos sobre los atributos (aunque en realidad sí se puede, pero la red semántica aumenta demasiado en tamaño y queda antinatural). Por esto es por lo que se siguen usando frames.
 \end{document}

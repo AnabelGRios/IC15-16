@@ -63,8 +63,24 @@ Como la lógica por defecto asume que el conocimiento es completo y consistente,
 
 La presencia de conocimiento incompleto nos lleva a modelos no monótonos: el conocimiento de nuevos hechos puede hacer que nos retractemos de algunas de nuestras creencias. Por ejemplo:
 \begin{enumerate}
-\item \textbf{Lógica por defecto}: propuesta por Reiter para solucionar el problema del conocimiento incompleto (1980), para lo que se introducen una serie de reglas por defecto. Intuitivamente, las reglas por defecto expresan características comunes a un conjunto de elementos que se asumen ciertas salvo que se indique lo contrario.
-\item \textbf{Asunción del mundo cerrado}: sirve para manejar conocimiento incompleto.  Intuitivamente, lo que no se puede probar a partir de mi base de conocimiento es falso.
+\item \textbf{Lógica por defecto}: propuesta por Reiter para solucionar el problema del conocimiento incompleto (1980), para lo que se introducen una serie de reglas por defecto. Intuitivamente, las reglas por defecto expresan características comunes a un conjunto de elementos que se asumen ciertas salvo que se indique lo contrario.\\
+Se representa como vemos en la imagen de abajo, que significa lo siguiente: \textit{Si se tienen A y B y no se tiene C entonces se da D. Por defecto, si se tienen A y B se da D, pero si se da C, entonces no se da D.}
+\begin{figure}[H]
+\includegraphics[width=0.2\textwidth]{logicadefecto}
+\centering
+\caption{Lógica por defecto}
+\label{fig:logicadefecto}
+\end{figure}
+
+En CLIPS se implementa de la siguiente manera:\\
+(A)\\
+(B)\\
+(not C)\\
+$\Rightarrow$ \\
+(assert (D))\\
+Es decir, CLIPS ya incorpora con not la lógica por defecto de Reiter. La regla se activa cuando A y B están en la base de hechos y C no está en la base de hechos.
+
+\item \textbf{Asunción del mundo cerrado}: sirve para manejar conocimiento incompleto.  Intuitivamente, lo que no se puede probar a partir de mi base de conocimiento es falso. CLIPS tiene implementada la hipótesis del mundo cerrado, que es por lo que podemos utilizar el not C arriba en el ejemplo, ya que si C no está en la base de hechos suponemos que es falso.
 \item \textbf{Inconvenientes}: Da lugar a teorías complejas y a veces inconsistentes.
 \end{enumerate}
 
