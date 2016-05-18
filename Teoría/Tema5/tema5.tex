@@ -1,0 +1,242 @@
+\documentclass[12pt]{article}
+
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,activeacute]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{enumerate}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{anysize}
+\usepackage{wrapfig}
+
+\marginsize{2cm}{2cm}{2cm}{2cm}
+
+\title{Tema 5: Representación de conocimiento con incertidumbre}
+\author{Anabel G\'omez R\'ios}
+
+\newtheorem{theorem}{Teorema}
+
+\begin{document}
+\maketitle
+
+\section{Introducción}
+Hasta ahora se han descrito técnicas de representación del conocimiento para un modelo del mundo \textbf{completo}, \textbf{consistente} e \textbf{inalterable}. Sin embargo, en muchos dominios de interés no es posible crear tales modelos debido a la presencia de incertidumbre: \textit{Falta de conocimiento seguro y claro de algo} (RAE).\\
+Vamos a revisar algunas aproximaciones para tratar con la incertidumbre.
+
+\section{Fuentes de incertidumbre}
+\subsection{Hechos}
+\begin{enumerate}
+\item \textbf{Ignorancia}: El conocimiento sobre el dominio difícilmente es completamente conocido y muchas veces hay que decidir con información incompleta. A veces no es posible acceder a todo el conocimiento \textit{¿Cuál será el resultado del lanzamiento de una moneda? ¿Es sincero quien está proporcionando esa información?}
+\item \textbf{Vaguedad e imprecisión}: Los hechos se indican de forma vaga e imprecisa: \textit{El dolor es muy grande}.
+\end{enumerate}
+\subsection{Reglas}
+Las reglas son generalmente expresadas por los expertos de forma lingüística y con mucha incertidumbre:
+\begin{enumerate}
+\item \textbf{Reglas inexactas o incompletas}. Por ejemplo \textit{'Si es un ave entonces vuela'} falla con los pingüinos o \textit{'Si tiene fiebre alta y dolor de garganta, es amigdalitis'} habitualmente sí, pero no siempre.
+\item \textbf{Reglas imprecisas}: \textit{'Si la presión es \underline{muy baja}, tomar \underline{abundantes} líquidos.'}
+\item \textbf{Reglas inconsistentes}: Por ejemplo, \textit{'Si hay una noticia negativa el valor pasa a ser inestable'} junto con \textit{'Si hay una noticia positiva el valor pasa a ser estable'}.
+\end{enumerate}
+
+\section{Razonamiento con incertidumbre}
+El \textbf{objetivo} es razonar con el conocimiento de que se dispone, aunque no se disponga de todo el conocimiento, o esté expresado de manera incierta o imprecisa.\\
+La \textbf{implementación} es difícil utilizando la lógica de primer orden. Hay que introducir modelos para manejar información vaga, incierta, incompleta o contradictoria. Esto es crucial para que un sistema funcione correctamente en el \textit{mundo real}.\\
+
+\textbf{Cuestiones generales a resolver por las aproximaciones a la incertidumbre:}
+\begin{enumerate}
+\item ¿Confianza/certeza en la veracidad de los hechos?
+\item ¿Confianza/certeza en la validez de las reglas?
+\item ¿Cómo deducir la confianza/certeza en la veracidad de las deducciones?
+\end{enumerate}
+
+\textbf{Modelos de representación de la incertidumbre:}
+\begin{enumerate}
+\item \underline{Modelos simbólicos}: Lógicas por defecto y lógicas basadas en modelos mínimos, en las que se asume la hipótesis del mundo cerrado y la terminación de predicados.
+\item \underline{Modelos numéricos}: basados en probabilidad, factores de certeza o lógica difusa.
+\end{enumerate}
+
+\section{El razonamiento no monótono}
+Como la lógica por defecto asume que el conocimiento es completo y consistente, una vez que un hecho se asume o es cierto, permanece así (\textbf{Monotonía}). Si de una base de conocimiento (BC) se deduce una expresión s, y se tiene otra base de conocimiento (BC') de forma que BC $\subset$ BC', entonces de BC' también se deduce s, por lo que el añadir nuevo conocimiento siempre incrementa el tamaño de la base de conocimiento.\\
+
+La presencia de conocimiento incompleto nos lleva a modelos no monótonos: el conocimiento de nuevos hechos puede hacer que nos retractemos de algunas de nuestras creencias. Por ejemplo:
+\begin{enumerate}
+\item \textbf{Lógica por defecto}: propuesta por Reiter para solucionar el problema del conocimiento incompleto (1980), para lo que se introducen una serie de reglas por defecto. Intuitivamente, las reglas por defecto expresan características comunes a un conjunto de elementos que se asumen ciertas salvo que se indique lo contrario.
+\item \textbf{Asunción del mundo cerrado}: sirve para manejar conocimiento incompleto.  Intuitivamente, lo que no se puede probar a partir de mi base de conocimiento es falso.
+\item \textbf{Inconvenientes}: Da lugar a teorías complejas y a veces inconsistentes.
+\end{enumerate}
+
+\subsection{Factores de certeza: MYCIN}
+Los factores de certeza aparecieron en el sistema experto MYCIN, desarrollado en la Universidad de Stanford (década de los 70) para el diagnóstico y consulta de enfermedades infecciosas. La base de conocimiento de MYCIN consistía en reglas de la forma Evidencia $\rightarrow$ Hipótesis FC(H|E). El factor de certeza FC representa la certidumbre en la Hipótesis cuando se observa la Evidencia. Los FC varían entre -1 (creencia nula) y 1 (creencia total) y se calculan a partir de los grados de creencia GC y no creencia en las hipótesis. Los GC varían entre 0 (creencia nula) y 1 (creencia total). La relación entre FC y GC es FC(H|E) = GC(H|E) - GC($\neg$H|E).\\
+A diferencia de los grados de creencia probabilísticos, GC(H|E) + GC($\neg$H|E) $\neq$ 1. \\
+
+Ejemplo:\\
+(\$AND \qquad (SAME CNTXT GRAM GRAMNEG)\\
+· \kern 5em (SAME CNTXT MORPH ROD)\\
+· \kern 5em (SAME CNTXT AIR ANAEROBIC))\\
+(CONCLUDE CNTXT IDENTITY BACTEROIDES TALLY .6)\\
+
+Que significa que SI el organismo es gram-negativo Y tiene forma de bastón Y es anaerobio ENTONCES el organismo es bacteroide (con certeza 0.6). \textbf{Los factores de certidumbre se introducían a meno por el diseñador}.
+
+\begin{figure}[H]
+ \centering
+  \subfloat[]{
+   \label{f:mycin1}
+    \includegraphics[width=0.5\textwidth]{mycin1}}
+  \subfloat[]{
+   \label{f:mycin2}
+    \includegraphics[width=0.5\textwidth]{mycin2}}
+ \caption{Ejemplo MYCIN}
+ \label{f:mycin}
+\end{figure}
+
+\subsection{Lógica Difusa}
+Nace a mediados de los 60, a causa de que el ser humano se expresa y razona comúnmente con términos vagos en lugar de precisos. La lógica difusa representa numéricamente términos vagos utilizando lógica multivaluada en [0,1]:\\
+grado\_de\_verdad('fiebre alta') $\in$ [0,	1]\\
+Las proposiciones se representan como restricciones de los valores que puede tomar una variable.\\
+
+Por ejemplo, dada la proposición \textit{'La temperatura del enfermo es alta'}, en la lógica clásica diríamos por ejemplo alta(temperatura) $\Leftrightarrow$ temperatura $>$ 38, por lo que si la temperatura es $37.99$, diríamos que no es alta. El ser humano no suele razonar así. En la lógica difusa se da un grado de libertad V a alta en función de la temperatura, por ejemplo:
+\begin{equation}
+V(alta(temperatura)) =   
+  \left\lbrace
+  \begin{array}{l}
+     0 \ \ \ \ \ \ \ \ \ \ \ \ \ temperatura < 38 \\
+     temperatura-38 \ \ \ 38 \leq temperatura \leq 39 \\
+     1 \ \ \ \ \ \ \ \ \ \ \ \ \ \ temperatura > 39
+  \end{array}
+  \right.
+\end{equation}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{ejemploT}
+\caption{Ejemplo temperatura}
+\label{fig:ejemploT}
+\end{figure}
+
+\textbf{Subconjunto difuso}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{subDifuso}
+\caption{Subconjunto difuso}
+\label{fig:subDifuso}
+\end{figure}
+
+\textbf{Operaciones con subconjuntos difusos}\\
+Intersección: $(A \cap B)(x)=Min(A(x),B(x))$\\
+Unión: $(A \cup B)(x)=Max(A(x),B(x))$\\
+Complemento: $(X-A)(x)=1-A(x)$
+
+\begin{figure}[H]
+ \centering
+  \subfloat[Intersección]{
+   \label{f:interseccion}
+    \includegraphics[width=0.35\textwidth]{interseccion}}
+  \subfloat[Unión]{
+   \label{f:union}
+    \includegraphics[width=0.35\textwidth]{union}}
+  \subfloat[Complemento]{
+   \label{f:complemento}
+    \includegraphics[width=0.27\textwidth]{complemento}}
+ \caption{Operaciones con subconjuntos}
+ \label{f:mycin}
+\end{figure}
+
+\textbf{Proposiciones compuestas}\\
+En la lógica difusa, al igual que en la lógica clásica, el valor de verdad de una proposición compuesta se calcula a través del valor de verdad de las proposiciones individuales. Existen varias formas de calcular estos valores de verdad. Los más usuales son:
+\[	V(A \wedge B) = min(V(A),V(B))	\]
+\[	V(A \vee B) = max(V(A),V(B))	\]
+\[	V(\neg A) = 1 - V(A)	\]
+\[	V(A \rightarrow B) = max(1-V(A),V(B))	\]
+Nótese que en la lógica difusa, en general:
+\[	V(A \wedge \neg A) \neq 0	\]
+\[	V(A \vee \neg A) \neq 1	\]
+A la primera se la llama no contradicción y a la segunda, tercio excluso.\\
+
+\textbf{Partición difusa}\\
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{particion}
+\caption{Partición difusa}
+\label{fig:particion}
+\end{figure}
+
+donde Bajo(x) + Medio(x) + Alto(x) = 1.
+
+\subsubsection{Razonamiento difuso basado en reglas}
+Vamos a verlo con un ejemplo. Supongamos que se le toma la temperatura a un paciente y se quiere saber la dosis apropiada de un medicamento. Supongamos que tenemos el hecho temperatura=38 y las reglas normal(temperatura) $\rightarrow$ baja(dosis), templada(temperatura) $\rightarrow$ media(dosis) y alta(temperatura) $\rightarrow$ alta(dosis).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{ejemplodifusa}
+\caption{Ejemplo difusa}
+\label{fig:ejemplodifusa}
+\end{figure}
+
+Generalmente el proceso difuso consta de 4 pasos:
+\begin{enumerate}
+\item \textbf{Matching}: Obtener los grados de verdad de los antecedentes. Se obtienen los grados de verdad de los antecedentes utilizando los hechos observados.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{ejemplodifusa2}
+\caption{Matching}
+\label{fig:ejemplodifusa2}
+\end{figure}
+\item \textbf{Inferencia}: Obtener los grados de verdad de los consecuentes. Una vez calculados los grados de verdad de la premisa de cada regla se recalculan los grados de verdad de los consecuentes mediante:
+\begin{enumerate}
+\item \underline{Min}: los grados de verdad del consecuente se cortan a la altura del grado de verdad de la premisa, o
+\item \underline{Producto}: se multiplican los grados de verdad de consecuente y premisa.
+\end{enumerate}
+En el ejemplo, normal(temperatura) $\rightarrow$ baja(dosis) tiene v=0.33, templada(temperatura) $\rightarrow$ media(dosis) tiene v=1 y alta(temperatura) $\rightarrow$ alta(dosis) tiene v=0.33
+\begin{figure}[H]
+ \centering
+  \subfloat[normal(temperatura) $\rightarrow \qquad$ baja(dosis), v=0.33]{
+   \label{f:ejemplodifusa31}
+    \includegraphics[width=0.3\textwidth]{ejemplodifusa31}}
+  \subfloat[templada(temperatura) $\rightarrow \quad$ media(dosis), v=1]{
+   \label{f:ejemplodifusa32}
+    \includegraphics[width=0.3\textwidth]{ejemplodifusa32}}
+  \subfloat[alta(temperatura) $\rightarrow \qquad \qquad$ alta(dosis), v=0.33]{
+   \label{f:ejemplodifusa33}
+    \includegraphics[width=0.3\textwidth]{ejemplodifusa33}}
+ \caption{Operaciones con subconjuntos}
+ \label{f:ejemplodifusa3}
+\end{figure}
+
+\item \textbf{Agregación (composición de consecuentes)}: Todos los grados de verdad difusos correspondientes a reglas con el mismo consecuente se combinan para dar lugar a los grados de verdad de la conclusión de las reglas mediante:
+\begin{enumerate}
+\item \underline{Max}: Se toma el máximo de los grados de verdad correspondientes a las distintas consecuencias, o
+\item \underline{Sum}: Se toma la suma de los grados de verdad correspondientes a las distintas consecuencias.
+\end{enumerate}
+
+En el ejemplo, componiendo las tres imágenes anteriores mediante max, tenemos:
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.39\textwidth]{ejemplodifusa4}
+\caption{Agregación}
+\label{fig:ejemplodifusa4}
+\end{figure}
+
+\item \textbf{Defuzzificación}: es una concisión (opcional). Se utiliza cuando se necesita convertir una conclusión difusa en concreta. Generalmente se utilizan los métodos:
+\begin{enumerate}
+\item \underline{Centroide}: se calcula el centro de gravedad de los grados de verdad de la conclusión difusa
+\[ centroide=\frac{\int x \cdot v(x)\ dx}{\int v(x)\ dx} \]
+\item \underline{Máximo}: se elige el valor máximo de los grados de verdad.
+\end{enumerate}
+En el ejemplo, el centroide es 6.76 y por tanto la dosis con 38 grados sería 6.76 ml.
+\end{enumerate}
+
+\subsubsection{Capacidad de la lógica difusa}
+
+\begin{theorem}
+\emph{Teorema de aproximación universal de los SBRD (Castro, 1995)}
+Los sistemas basados en reglas difusas son aproximadores universales
+\end{theorem}
+
+Este teorema implica que las funciones continuas definidas sobre un compacto se pueden aproximar tanto como se quiera por un sistema basado en reglas difusas.\\
+SBRD(K)=\textit{Clases de todos los sistemas basados en reglas difusas definidas sobre el dominio K}\\
+\textbf{Formalmente}: $\forall K$ compacto de $\mathbb{R}^n,\ \forall f \in \mathcal{C}(K),\ \forall \varepsilon > 0,\ \exists S \in SBRD(K)$ tal que $||f-S|| \leq \varepsilon$
+
+\end{document}
