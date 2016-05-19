@@ -41,13 +41,13 @@ En clase hemos visto sistemas expertos basados en reglas del tipo \textbf{SI} \t
 Este tipo de sistemas son muy útiles y muy utilizados por su simplicidad y el parecido con el razonamiento humano, pero presentan varios inconvenientes:
 \begin{enumerate}
     \item Mantener la coherencia entre las reglas de la base de conocimiento. Pueden aparecer dos tipos de problemas: encadenamientos infinitos, cuando aparecen reglas del tipo \textit{Si A entonces B} junto con \textit{Si B entonces A} y problemas de ampliación en la base de conocimiento cuando hay que realizar una actualización y para mantener la coherencia la base de datos se hace innecesariamente grande, llegando incluso a ser mejor reconstruirla de nuevo.
-    \item Dificultades para retractarse de anteriores conclusiones, provocado principalmente por el carácter modular y monótono de estos sistemas, ya que cuando se cumple la condición de una regla, se da la acción sin tener en cuenta el resto del conocimiento.
+    \item Dificultades para retractarse de anteriores conclusiones debido al carácter modular y monótono de estos sistemas, ya que cuando se cumple la condición de una regla, se da la acción sin tener en cuenta el resto del conocimiento.
     \item Opacidad: Al tener que dividir el conocimiento en pequeñas reglas, se pierde perspectiva global del problema tratado.
     \item Ineficiencia provocada por la continua comprobación de las reglas en cada iteración.
 \end{enumerate}
 
-Sin embargo el principal problema es que cuando se trabaja con problemas reales y conocimiento humano en la mayoría de los casos hay inherente incertidumbre bien en el conocimiento, es decir, en cómo se ha obtenido el conocimiento, o bien en el conjunto de datos, es decir, si los datos no se han determinado de forma precisa o faltan datos.\\
-Normalmente, las evidencias que tenemos sobre un hecho no nos permiten deducir con seguridad las conclusiones o la negación de las mismas, pero sí nos permiten dar mayor credibilidad a una sentencia. Por esto, si queremos diseñar un sistema experto capaz de obtener las mismas conclusiones que un experto humano, tenemos darle la capacidad de trabajar con incertidumbre.
+Sin embargo el principal problema es que cuando se trabaja con problemas reales y conocimiento humano en la mayoría de los casos hay inherente incertidumbre bien en los hechos (en el conocimiento, que no se conoce completamente), o bien en las reglas que son incompletas, imprecisas o inconsistentes.\\
+Normalmente, las evidencias que tenemos sobre un hecho no nos permiten deducir con seguridad las conclusiones o la negación de las mismas, pero sí nos permiten dar mayor credibilidad a una regla.
 
 \section{Ejemplo de sistema experto Probabilístico: MYCIN}
 MYCIN fue el primer sistema experto que consideró conocimiento incierto. En este sistema, una regla \textbf{Si} A \textbf{Entonces} B se representaba $A \overset{m}{\rightarrow}B$, expresando que si se conoce $A$, entonces se puede actualizar la certeza de $B$ en cierta cantidad, en función de la fuerza de la regla, $m$. El valor $m$ se denomina factor de certeza de la regla y toma valores en el intervalo $[-1,1]$.\\
@@ -56,8 +56,8 @@ Supongamos el siguiente ejemplo:
 \[A \overset{m_1=0.8}{\longrightarrow} B ; B\ y\ C \overset{m_2=0.7}{\longrightarrow} D
 \]
 y observamos $A$ (y por tanto la certeza de $A$, que vamos a representar $Ctz(A)$ es 1) y la certeza sobre $C$ es 0.6. Entonces, nuestra creencia de $B$ se actualiza a un valor 0.8, $Ctz(B)=0.8$ y tenemos que actualizar la certeza sobre $D$. En estos casos, MYCIN calcula el valor de certeza para la sentencia $B\ y \ C$ como una función de las certezas de $A$ y $B$: $Ctz(B\ y\ C) = min{0.8,0.6}=0.6$ y por tanto $Ctz(D)=0.6*0.7=0.42$.\\
-%?
-Después veremos mecanismos de propagación que permiten trabajar con sistemas más complejos.
+
+Después comentaremos mecanismos de propagación que permiten trabajar con sistemas más complejos.
 
 \section{Problemas de los sistemas expertos con incertidumbre}
 \begin{enumerate}
@@ -88,7 +88,7 @@ En los sistemas expertos basados en reglas, el aprendizaje consiste en incorpora
 Vamos a ver algunas nociones básicas de probabilidad que serán de utilidad para trabajar con este tipo de sistemas.
 
 \subsection{Probabilidad marginal}
-Sean $X_1,X_2,...,X_n$ un conjunto de variables aleatorias que toman valores discretos y sea $\{x_1,x_2,...,x_n\}$ el conjunto de sus posibles realizaciones. Sea $P(x_1,x_2,...,x_n)$ una probabilidad sobre $X_1,X_2,...,X_n$, es decir, $P(x_1,x_2,...,x_n) = P(X_1 = x_1,...,X_n=x_n)$, entonces la distribución de probabilidad marginal sobre la $i$-ésima variables se obtiene mediante
+Sean $X_1,X_2,...,X_n$ un conjunto de variables aleatorias que toman valores discretos y sea $\{x_1,x_2,...,x_n\}$ el conjunto de los posibles valores que pueden tomar. Sea $P(x_1,x_2,...,x_n)$ una probabilidad sobre $X_1,X_2,...,X_n$, es decir, $P(x_1,x_2,...,x_n) = P(X_1 = x_1,...,X_n=x_n)$, entonces la distribución de probabilidad marginal sobre la $i$-ésima variables se obtiene mediante
 \[	P(x_i) = P(X_i=x_i) = \sum_{x_1,...,x_{i-1},x_{i+1},...,x_n}P(x_1,...,x_n)	\]
 
 \subsection{Probabilidad condicionada}
@@ -112,9 +112,9 @@ Si tenemos en cuenta que $P(x) = \sum_{y \in Y}P(x,y)$ y que $P(x,y) = P(x|y)P(y
 \[	P(x|y) = \frac{P(x|y)P(y)}{\sum_{y \in Y} P(x|y)P(y)}	\]
 
 \section{Sistemas Expertos Probabilísticos}
-Son dos los elementos esenciales que caracterizan a un sistema experto: La base de conocimiento y el motor de inferencia. Desde un punto de vista general, en un sistema experto probabilístico la base de conocimiento está formada por un conjunto de variables $X_1,...,X_n$ y una distribución de probabilidad conjunta sobre ellas $P(x_1,...,x_n)$. Por otro lado, un motor de inferencia básico sará aquel que nos permita actualizar nuestra información sobre una determinada variable (o conjunto de ellas), $X$, ante la presencia de un conjunto de hechos, evidencias o síntomas determinados, $E$. En teoría de la probabilidad este motor de inferencia no es más que el cálculo de la probabilidad condicional $P(X|E)$.\\
-Si tratamos de realizar una aproximación directa, en la que representamos la distribución de probabilidad conjunta con una tabla, pronto nos damos cuenta de que, incluso en problemas con un conjunto pequeño de variables, el problema es intratable. Sin embargo, son muchas las aplicaciones prácticas en las que conocemos \textit{a priori} que, por ejemplo, dos variables son (marginal o condicionalmente) independientes. En estos casos, podemos utilizar dicha información con el objetivo de reducir el espacio necesario para almacenar la distribución de probabilidad conjunta. La idea es dividir o factorizar dicha distribución en un conjunto de distribuciones más pequeñas que tengan la misma representatividad. En cualquier caso, es necesario proporcionar un método que permita recuperar los valores originales de la distribución de probabilidad conjunta.\\
-La idea básica es codificar el conocimiento de tal manera que no sea necesario el utilizar información que sea irrelevante y, por otro lado, la información relevante sea fácilmente accesible. Podemos encontrar distintos modelos para implementar esta idea, entre los que se encuentran las redes de Markov y las redes Bayesianas. Ambos sistemas se apoyan en modelos gráficos para representar de forma explícita las relaciones de dependencia e independencia entre las variables.
+Como hemos dicho, en un sistema experto probabilístico la base de conocimiento está formada por un conjunto de variables $X_1,...,X_n$ y una distribución de probabilidad conjunta sobre ellas $P(x_1,...,x_n)$ y el motor de inferencia es el cálculo de la probabilidad condicional $P(X|E)$.\\
+Si tratamos de realizar una aproximación directa, en la que representamos la distribución de probabilidad conjunta con una tabla, nos daremos cuenta de que, incluso en problemas con un conjunto pequeño de variables, el problema es intratable. Sin embargo, son muchas las aplicaciones prácticas en las que se conoce \textit{a priori} que, por ejemplo, dos variables son (marginal o condicionalmente) independientes. En estos casos, podemos utilizar dicha información para hacer el problema tratable. La idea es dividir la distribución conjunta en un conjunto de distribuciones más pequeñas que tengan la misma representatividad, siendo necesario después proporcionar un método que permita recuperar los valores originales de la distribución de probabilidad conjunta.\\
+La idea básica es codificar el conocimiento de tal forma en la misma representación no sea necesario el utilizar información que sea irrelevante y la información relevante sea fácilmente accesible. Dos de estos modelos son las redes de Markov y las redes Bayesianas. Ambos sistemas se apoyan en modelos gráficos para representar de forma explícita las relaciones de dependencia e independencia entre las variables.
 
 \section{Redes de Markov}
 Las redes de Markov se representan gráficamente mediante grafos no dirigidos, donde los nodos representan las variables y una relación de dependencia entre dos variables se representa mediante la existencia de un camino o conexión entre ellas. Por otra parte, en estos modelos también se representan las relaciones de independencia. En concreto, si $X,Y$ y $Z$ son conjuntos disjuntos de variables, entonces:
@@ -123,6 +123,12 @@ Las redes de Markov se representan gráficamente mediante grafos no dirigidos, d
 \item Una relación de independencia condicionada del tipo $I(X,Z,Y)$ se representa por el hecho de que todo camino que conecta las variables de $X$ con variables de $Y$ contiene algún nodo de $Z$. Por tanto, si los nodos en $Z$ son borrados del grafo, las variables $X$ e $Y$ quedan desconectadas.\\
 De esta forma, somos capaces de determinar cuándo dos variables son dependientes o no. Pero, ¿puede el modelo gráfico representar todas las relaciones de dependencia / independencia que se derivan de una distribución de probabilidad conjunta?\\
 La respuesta a esta pregunta es que no. Supongamos el siguiente ejemplo:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.3\textwidth]{ejemplo}
+\caption{Ejemplo} \label{fig:ejemplo}
+\end{figure}
 
 De aquí podemos deducir varias cosas:
 \begin{enumerate}
@@ -144,7 +150,7 @@ Nos queda por tanto el siguiente grafo:
 \end{tikzpicture}
 \end{center}
 
-De aquí podemos deducir que existe un camino que conecta $X$ con $Y$, el que pasa por $Z$, en contra de lo primera deducción. Las redes de Markov por tanto no son capaces de representar relaciones de independencia no transitivas. Una herramienta para diseñar sistemas expertos probabilísticos utilizando el formalismo más potente de los grafos dirigidos para representar las relaciones entre las variables son las redes bayesianas, que veremos a continuación.
+De aquí podemos deducir que existe un camino que conecta $X$ con $Y$, el que pasa por $Z$, en contra de la primera deducción. Las redes de Markov por tanto no son capaces de representar relaciones de independencia no transitivas. Una herramienta para diseñar sistemas expertos probabilísticos utilizando el formalismo más potente de los grafos dirigidos para representar las relaciones entre las variables son las redes bayesianas, que veremos a continuación.
 \end{enumerate}
 
 \section{Redes bayesianas}
@@ -221,8 +227,9 @@ La base de conocimiento de un sistema experto probabilístico está formada por 
 \item \textbf{Adquisición de la información cualitativa}. Si disponemos de un experto le pediremos que muestre las relaciones relevantes (también las de independencia). Es de utilidad basarse en modelos gráficos.
 \item \textbf{Adquisición de la información cuantitativa}. Este último paso consiste en asignarle valores a la distribución de probabilidad conjunta que tenemos que almacenar en cada nodo en la red. Es conveniente que el experto pueda colaborar con especialistas en estadística para mejorar la calidad de los datos y validar.
 \end{itemize}
+
+
 \section{Métodos de propagación}
-\section{Algoritmos de propagación}
 Vamos a ver ahora cómo propagar el impacto de una nueva evidencia a través de una Red Bayesiana de manera que las nuevas asignaciones de certidumbre sobre las variables del modelo sean consistentes con los axiomas de la probabilidad.\\
 El mecanismo para obtener conclusiones a partir de la evidencia se conoce como propagación de evidencia. Existen tres tipos distintos de algoritmos de propagación: exactos, aproximados y simbólicos. Los exactos son aquellos que calculan las probabilidades de los nodos sin otro error que el resultante del redondeo producido por las limitaciones del cálculo del ordenador. Los aproximados son los que utilizan distintas técnicas de simulación para obtener valores aproximados de las probabilidades y se utilizan en los casos en los que los algoritmos exactos no son aplicables o son computacionalmente costosos. Los algoritmos de propagación simbólica son aquellos que pueden operar no sólo con parámetros numéricos, sino también con parámetros simbólicos, obteniendo las probabilidades en forma simbólica, es decir, en función de los parámetros.\\
 
@@ -234,7 +241,7 @@ Aquí vamos a dar la idea de algunos de estos métodos, pero cabe destacar que h
 La propagación de evidencia es una de las tareas más importantes del sistema experto, ya que permite obtener conclusiones cuando se dispone de nueva información. Supóngase un conjunto de variables discretas $X=(X_1,...,X_n)$ y una función de probabilidad $p(x)$, en $X$. Cuando no se dispone de ninguna información, es decir, cuando no existe evidencia, el proceso de propagación consiste en calcular las probabilidades marginales $p(X_i=x_i)$ para cada $X_i \in X$. Estas probabilidades proporcionan información "a priori" sobre los distintos valores que pueden tomar las variables.\\
 Cuando se dispone de cierta evidencia, es decir, de un conjunto de variables $E \subset X$ que tienen asociadas los valores $X_i = e_i$ para $X_i \in E$, el proceso de propagación debe tener en cuenta estos valores para calcular las nuevas probabilidades de los nodos. De esta forma, la propagación de evidencia consiste en calcular las funciones de probabilidad condicionada $p(x_i|e)$ para cada variable $X_i$ dada la evidencia $E=e$.\\
 
-El problema de este método es el elevado número de combinaciones de valores que involucra, ya que lo hace altamente ineficiente, incluso en redes con un número reducido de variables.
+El problema de este método es el elevado número de combinaciones de valores que involucra, lo que lo hace altamente ineficiente, incluso en redes con un número reducido de variables.
 
 \subsubsection{Propagación en poliárboles}
 La característica principal de este algoritmo es que su complejidad es lineal en el tamaño de la red (número de nodos y aristas de la misma), a diferencia del método anterior.\\
@@ -244,7 +251,7 @@ En este tipo de grafos, el proceso de propagación puede realizarse como hemos d
 \item $E_i^+$, que es el subconjunto de $E$ accesible desde $X_i$ a través de sus padres.
 \item $E_i^-$, que es el subconjunto de $E$ accesible desde $X_i$ a través de sus hijos.
 \end{enumerate}
-Por tanto, se tiene $E=E_i^+ \cup E_i^-$. La idea es que a su vez, $E_i^+$ y $E_i^-$ se pueden descomponer en $p$ y $p'$ subconjuntos disjuntos, uno por cada padre en cada subconjunto, y utilizando la independencia de los subconjuntos, se puede ver que un nodo $X_i$ puede calcular su función $\rho_i(x_i)=p(x_i,e_i^+)$ una vez haya recibido los mensajes de todos sus padres (e igualmente con los hijos)
+Por tanto, se tiene $E=E_i^+ \cup E_i^-$. La idea es que a su vez, $E_i^+$ y $E_i^-$ se pueden descomponer en $p$ y $p'$ subconjuntos disjuntos, uno por cada padre en cada subconjunto, y utilizando la independencia de los subconjuntos, se puede ver que un nodo $X_i$ puede calcular su evidencia una vez haya recibido los mensajes de todos sus padres (e igualmente con los hijos)
 
 \subsubsection{¿Qué ocurre cuando hay ciclos?}
 Como hemos comentado, el método anterior sólo sirve cuando no hay ciclos, puesto que los padres de un nodo pueden compartir información (es decir, cada padre no puede influir independientemente de los demás sobre la probabilidad de sus hijos comunes).\\
@@ -255,6 +262,11 @@ Hay una serie de métodos que pueden usarse cuando se presentan ciclos, como el 
 La idea básica de estos métodos consiste en generar una muestra de tamaño $N$ a partir de la función de probabilidad conjunta de las variables, y luego utilizar la muestra generada para calcular valores aproximados de las probabilidades de ciertos sucesos dada la evidencia. Se pueden separar en dos tipos, los métodos de simulación estocástica, que generan la muestra a partir de la función de probabilidad conjunta usando algunos mecanismos aleatorios, y los métodos de búsqueda determinista, que generan la muestra de forma sistemática.
 
 \section{Bibliografía}
+
+\begin{enumerate}
+\item \textit{Sistemas expertos y modelos de redes probabilísticas}, Enrique Castillo, José Manuel Gutiérrez y Ali S. Hadi.
+\item \textit{Sistemas expertos probabilísticos}, Gámez Martín y Puerta Callejón, disponible en Google Books.
+\end{enumerate}
 
 
 \end{document}
