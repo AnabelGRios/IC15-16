@@ -123,11 +123,6 @@ Las redes de Markov se representan gráficamente mediante grafos no dirigidos, d
 \item Una relación de independencia condicionada del tipo $I(X,Z,Y)$ se representa por el hecho de que todo camino que conecta las variables de $X$ con variables de $Y$ contiene algún nodo de $Z$. Por tanto, si los nodos en $Z$ son borrados del grafo, las variables $X$ e $Y$ quedan desconectadas.\\
 De esta forma, somos capaces de determinar cuándo dos variables son dependientes o no. Pero, ¿puede el modelo gráfico representar todas las relaciones de dependencia / independencia que se derivan de una distribución de probabilidad conjunta?\\
 La respuesta a esta pregunta es que no. Supongamos el siguiente ejemplo:
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.3\textwidth]{ejemplo}
-\caption{Ejemplo} \label{fig:ejemplo}
-\end{figure}
 
 De aquí podemos deducir varias cosas:
 \begin{enumerate}
@@ -207,12 +202,57 @@ Si relacionamos esto con el concepto de d-separabilidad visto anteriormente tene
 
 \subsection{Redes bayesianas y modelos de dependencia}
 
+Para considerar un GDA, al que hemos asociado un conjunto de distribuciones de probabilidad para cada nodo, como una representación de una distribución de probabilidad conjunta es necesario que ciertas relaciones de independencia del grafo sean válidas en la distribución de probabilidad. En cambio dada una distribución de probabilidad no siempre es posible construir el grafo.
 
+\begin{definicion}[Red bayesiana]
+Una red bayesiana es un par $(G(X,A),P)$ donde $G$ es GDA, $X$ es el conjunto de vértices (variables), $A$ el conjunto de arcos y $P=\{P(X_1|\Pi_1),\dots,P(X_n|\Pi_n)\}$ es un conjunto de $n$ funciones de probabilidad condicionada, una para cada variable, y $\Pi_i$ es el conjunto de padres de $X_i$ en $G$. El conjunto $P$ define una función de probabilidad asociada mediante la factorización
+\[ P(X) = \prod\limits_{i=1}^n P(X_i|\Pi_i)	\]
+\end{definicion}
 
+Toda relación de independencia de la red es una relación de independencia válida en la distribución de probabilidad $P(X)$.Esto permite detectar cuándo la información que proporciona una determinada variable es relevante ante una determinada consulta.
+
+\subsection{Construcción del sistema experto probabilístico}
+
+La base de conocimiento de un sistema experto probabilístico está formada por un conjunto de variables y una distribución de probabilidad conjunta sobre ellas. Para especificar la base de conocimientos se suele hacer uso de modelos más sofisticados que factoricen la distribución en funciones de tamaño menor. Los pasos para el diseño del sistema experto son:
+
+\begin{itemize}
+\item \textbf{Planteamiento del problema}. Es fundamental tener una buena definición del problema para mejorar los resultados obtenidos.
+\item \textbf{Selección de variables}. Después se selecciona el conjunto de variables relevantes.
+\item \textbf{Adquisición de la información cualitativa}. Si disponemos de un experto le pediremos que muestre las relaciones relevantes (también las de independencia). Es de utilidad basarse en modelos gráficos.
+\item \textbf{Adquisición de la información cuantitativa}. Este último paso consiste en asignarle valores a la distribución de probabilidad conjunta que tenemos que almacenar en cada nodo en la red. Es conveniente que el experto pueda colaborar con especialistas en estadística para mejorar la calidad de los datos y validar.
+\end{itemize}
 \section{Métodos de propagación}
+\section{Algoritmos de propagación}
+Vamos a ver ahora cómo propagar el impacto de una nueva evidencia a través de una Red Bayesiana de manera que las nuevas asignaciones de certidumbre sobre las variables del modelo sean consistentes con los axiomas de la probabilidad.\\
+El mecanismo para obtener conclusiones a partir de la evidencia se conoce como propagación de evidencia. Existen tres tipos distintos de algoritmos de propagación: exactos, aproximados y simbólicos. Los exactos son aquellos que calculan las probabilidades de los nodos sin otro error que el resultante del redondeo producido por las limitaciones del cálculo del ordenador. Los aproximados son los que utilizan distintas técnicas de simulación para obtener valores aproximados de las probabilidades y se utilizan en los casos en los que los algoritmos exactos no son aplicables o son computacionalmente costosos. Los algoritmos de propagación simbólica son aquellos que pueden operar no sólo con parámetros numéricos, sino también con parámetros simbólicos, obteniendo las probabilidades en forma simbólica, es decir, en función de los parámetros.\\
 
-%¿?
-\section{Modelos en el campo de la medicina}
+Aquí vamos a dar la idea de algunos de estos métodos, pero cabe destacar que hay muchos más, y que si se desea ver el procedimiento completo, se puede ver en la referencia [1].
+
+\subsection{Métodos Exactos}
+
+\subsubsection{Propagación de evidencia}
+La propagación de evidencia es una de las tareas más importantes del sistema experto, ya que permite obtener conclusiones cuando se dispone de nueva información. Supóngase un conjunto de variables discretas $X=(X_1,...,X_n)$ y una función de probabilidad $p(x)$, en $X$. Cuando no se dispone de ninguna información, es decir, cuando no existe evidencia, el proceso de propagación consiste en calcular las probabilidades marginales $p(X_i=x_i)$ para cada $X_i \in X$. Estas probabilidades proporcionan información "a priori" sobre los distintos valores que pueden tomar las variables.\\
+Cuando se dispone de cierta evidencia, es decir, de un conjunto de variables $E \subset X$ que tienen asociadas los valores $X_i = e_i$ para $X_i \in E$, el proceso de propagación debe tener en cuenta estos valores para calcular las nuevas probabilidades de los nodos. De esta forma, la propagación de evidencia consiste en calcular las funciones de probabilidad condicionada $p(x_i|e)$ para cada variable $X_i$ dada la evidencia $E=e$.\\
+
+El problema de este método es el elevado número de combinaciones de valores que involucra, ya que lo hace altamente ineficiente, incluso en redes con un número reducido de variables.
+
+\subsubsection{Propagación en poliárboles}
+La característica principal de este algoritmo es que su complejidad es lineal en el tamaño de la red (número de nodos y aristas de la misma), a diferencia del método anterior.\\
+El poliárbol es uno de los modelos gráficos más simples para construir redes bayesianas. Son árboles en los que los nodos pueden tener más de un padre. Además cumplen la propiedad de que dos nodos cualesquiera están unidos por un único camino, lo que implica que cada nodo del poliárbol divide al mismo en dos poliárboles inconexos, uno conteniendo a los padres del nodo por el que dividimos y otro conteniendo a los hijos.\\
+En este tipo de grafos, el proceso de propagación puede realizarse como hemos dicho, de modo eficiente combinando la información procedente de los distintos subgrafos mediante el envío de mensajes (cálculos locales) de un subgrafo a otro. Supóngase que se conoce una cierta evidencia $E=e$ y que se quieren calcular las probabilidades $p(x_i|e)$ para todos los valores $x_i$ de un nodo cualquiera $X_i$ que no esté contenido en $E$. Para facilitar el cálculo de estas probabilidades, el conjunto de evidencia $E$ se puede descomponer en dos subconjuntos disjuntos, cada uno de los cuales está contenido en uno de los poliárboles separados por el nodo $X_i$ en el poliárbol original. Por tanto, $E$ se puede descomponer como:
+\begin{enumerate}
+\item $E_i^+$, que es el subconjunto de $E$ accesible desde $X_i$ a través de sus padres.
+\item $E_i^-$, que es el subconjunto de $E$ accesible desde $X_i$ a través de sus hijos.
+\end{enumerate}
+Por tanto, se tiene $E=E_i^+ \cup E_i^-$. La idea es que a su vez, $E_i^+$ y $E_i^-$ se pueden descomponer en $p$ y $p'$ subconjuntos disjuntos, uno por cada padre en cada subconjunto, y utilizando la independencia de los subconjuntos, se puede ver que un nodo $X_i$ puede calcular su función $\rho_i(x_i)=p(x_i,e_i^+)$ una vez haya recibido los mensajes de todos sus padres (e igualmente con los hijos)
+
+\subsubsection{¿Qué ocurre cuando hay ciclos?}
+Como hemos comentado, el método anterior sólo sirve cuando no hay ciclos, puesto que los padres de un nodo pueden compartir información (es decir, cada padre no puede influir independientemente de los demás sobre la probabilidad de sus hijos comunes).\\
+Hay una serie de métodos que pueden usarse cuando se presentan ciclos, como el método de condicionamiento y el método de agrupamiento. La idea fundamental del primero es cortar los múltiples caminos entre los nodos mediante la asignación de valores a un conjunto reducido de variables contenidas en los bucles, obteniendo un poliárbol en el se puede aplicar el método anterior. El segundo método construye representaciones auxiliares de estructura más simple, uniendo conjuntos de nodos del grafo original, hasta que se obtiene de nuevo un poliárbol.
+
+\subsection{Métodos de propagación aproximada}
+
+La idea básica de estos métodos consiste en generar una muestra de tamaño $N$ a partir de la función de probabilidad conjunta de las variables, y luego utilizar la muestra generada para calcular valores aproximados de las probabilidades de ciertos sucesos dada la evidencia. Se pueden separar en dos tipos, los métodos de simulación estocástica, que generan la muestra a partir de la función de probabilidad conjunta usando algunos mecanismos aleatorios, y los métodos de búsqueda determinista, que generan la muestra de forma sistemática.
 
 \section{Bibliografía}
 
