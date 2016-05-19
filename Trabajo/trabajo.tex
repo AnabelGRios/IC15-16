@@ -16,6 +16,21 @@
         Jacinto Carrasco Castillo}
 \date{Mayo 2016}
 
+% Definición de estilo de definición
+\newtheoremstyle{definition_wo_parentheses}
+  {\topsep}% measure of space to leave above the theorem. E.g.: 3pt
+  {\topsep}% measure of space to leave below the theorem. E.g.: 3pt
+  {}% name of font to use in the body of the theorem
+  {0pt}% measure of space to indent
+  {\bfseries}% name of head font
+  {.}% punctuation between head and body
+  { }% space after theorem head; " " = normal interword space
+  {\thmname{#1}\thmnumber{ #2.}\thmnote{ #3}}
+  
+  
+\theoremstyle{definition_wo_parentheses}	
+\newtheorem{definicion}{Definición}
+
 \begin{document}
 
 \maketitle
@@ -121,16 +136,25 @@ De aquí podemos deducir varias cosas:
 \end{enumerate}
 
 Nos queda por tanto el siguiente grafo:
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.2\textwidth]{grafo}
-\caption{Grafo deducido} \label{fig:grafo}
-\end{figure}
+\begin{center}
+\begin{tikzpicture}[y=.3cm, x=.3cm,font=\normalsize]
+
+\node[draw, circle] (X) at (10,10) {$X$};
+\node[draw, circle] (Y) at (10,0) {$Y$};
+\node[draw, circle] (Z) at (0,5) {$Z$};
+
+\draw (X) -- (Z);
+\draw (Z) -- (Y);
+
+\end{tikzpicture}
+\end{center}
 
 De aquí podemos deducir que existe un camino que conecta $X$ con $Y$, el que pasa por $Z$, en contra de lo primera deducción. Las redes de Markov por tanto no son capaces de representar relaciones de independencia no transitivas. Una herramienta para diseñar sistemas expertos probabilísticos utilizando el formalismo más potente de los grafos dirigidos para representar las relaciones entre las variables son las redes bayesianas, que veremos a continuación.
 \end{enumerate}
 
 \section{Redes bayesianas}
+
+\subsection{Conceptos previos}
 
 Las redes bayesianas son uno de los modelos con más importancia en los sistemas expertos probabilísticos. Gráficamente consisten en un grafo dirigido acíclico, donde los nodos son variables del problema a resolver. Las redes bayesianas permiten representar dos aspectos del conocimiento:
 
@@ -139,22 +163,51 @@ Las redes bayesianas son uno de los modelos con más importancia en los sistemas
 \item \textbf{Cuantitativo}: Fuerza con la que nos creemos las relaciones de relevancia o dependencia.
 \end{enumerate}
 
-Usaremos la representación mediante grafos para representar la dependencia, por
+Usaremos la representación mediante grafos para indicar la dependencia, por ejemplo, suponemos que representamos un problema que trata del alquiler de un vehículo para un viaje. Las variables son el \textit{Tipo de Vehículo}, \textit{Tipo de Carretera}, \textit{Velocidad Media} durante el viaje, \textit{Duración}, \textit{Precio} del alquiler y \textit{Kilómetros} a recorrer. Si hay un arco, habrá dependencia. 
 
 \begin{center}
-\begin{tikzpicture}[y=.3cm, x=.3cm,font=\normalsize]
+\begin{tikzpicture}[y=.3cm, x=.3cm,font=\normalsize,shorten >=1pt,->]
 
-\draw[->] (4,10) edge (0,5);
+\node[draw, circle] (P) at (0,5) {$P$};
+\node[draw, circle] (TV) at (4,10) {$TV$};
+\node[draw, circle] (VM) at (8,5) {$VM$};
+\node[draw, circle] (TC) at (12,10) {$TC$};
+\node[draw, circle] (D) at (12,0) {$D$};
+\node[draw, circle] (K) at (16,5) {$K$};
 
-\filldraw[fill=white!0,draw=black!80] (0,5) circle (10pt) node[] {$P$};
-\filldraw[fill=white!0,draw=black!80] (4,10) circle (10pt) node[] {$TV$};
-\filldraw[fill=white!0,draw=black!80] (8,5) circle (10pt) node[] {$VM$};
-\filldraw[fill=white!0,draw=black!80] (12,10) circle (10pt) node[] {$TC$};
-\filldraw[fill=white!0,draw=black!80] (12,0) circle (10pt) node[] {$D$};
-\filldraw[fill=white!0,draw=black!80] (16,5) circle (10pt) node[] {$K$};
+\draw (TV) -> (P);
+\draw (TV) -> (VM);
+\draw (VM) -> (D);
+\draw (TC) -> (VM);
+\draw (K) -> (D);
 
 \end{tikzpicture}
 \end{center}
+
+Podemos decir que \textit{TC} y \textit{D} son variables dependientes, en cambio si conocemos \textit{VM} (velocidad media del viaje, \textit{TC} y \textit{D} son independientes. Esto induce el concepto de \textit{d-separación}.
+
+\begin{definicion}[d-separación]
+	Si $X,Y,Z$ son subconjuntos disjuntos de nodos en $G$ GDA (grafo dirigido acíclico), entonces $Z$ \textbf{d-separa} $X$ de $Y$ ($<X|Z|Y>_G$) si todos los caminos entre cualquier nodo de $X$ y cualquier nodo de $Y$ están bloqueados por $Z$. 
+\end{definicion}
+
+Esto nos permite representar las relaciones entre las variables. Ahora veremos cómo expresarlo de forma numérica. Supongamos dadas dos variables $X,Y$, $X \rightarrow Y$, debido a que hay una dependencia entre las dos variables. La incertidumbre asociada a este tipo de relaciones la podemos representar mediante el uso de una distribución de probabilidad condicionada sobre $Y$ dado $X$, $P(Y|X)$.\\
+Cuando tenemos los valores para las distribuciones de probabilidad condicionadas, construimos la distribución de probabilidad conjunta sobre $X_1, \dots, X_n$:
+\[ P(X_1, \dots,X_n) = \prod\limits_{i=1}^n P(X_i,\Pi(X_i))\]
+
+donde $\Pi(X_i)$ representa el conjunto de padres de un nodo $X_i$ en la red.\\
+
+Si relacionamos esto con el concepto de d-separabilidad visto anteriormente tenemos:
+
+\begin{equation}
+	<X|\emptyset|Y>_G \rightarrow P(X,Y) = P(X) P(Y)
+\end{equation}
+\begin{equation}
+	<X|Y|Z>_G \rightarrow P(X|Y) = P(X|Y,Z)
+\end{equation}
+
+\subsection{Redes bayesianas y modelos de dependencia}
+
+
 
 \section{Métodos de propagación}
 
