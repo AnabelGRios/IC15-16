@@ -183,10 +183,20 @@ Toda relación de independencia de la red es una relación de independencia en l
 
 \begin{frame}
 \frametitle{Métodos de propagación}
-En las redes bayesianas se hace necesario propagar el impacto de una nueva evidencia de manera consistente.
 \framesubtitle{Métodos exactos}
+En las redes bayesianas se hace necesario propagar el impacto de una nueva evidencia de manera consistente.\\
+Cuando no existe evidencia, el proceso de propagación consiste en calcular las probabilidades marginales $P(X_i=x_i)$ para $X_i \in X$. Cuando se dispone de evidencias, el proceso de propagación debe tener en cuenta estos valores para calcular las nuevas probabilidades, es decir, $P(x_i| e)$ para cada variable $X_i$ dada la evidencia $e$. Es altamente ineficiente.\\
+Existen métodos específicos y eficientes para poliárboles (árboles donde los nodos pueden tener más de un padre). Consiste en descomponer los poliárboles en los nodos accesibles a través de los padres y a través de los hijos, calculando la evidencia una vez recibidas las evidencias de los padres.
 \end{frame}
 
+\begin{frame}
+\frametitle{Métodos de propagación}
+\framesubtitle{Métodos aproximados - Métodos simbólicos}
+
+\textbf{Métodos aproximados}: Se genera una muestra de tamaño $N$ a partir de la función de probabilidad conjunta, y se utiza para calcular valores aproximados de las probabilidades de ciertos sucesos dada la evidencia. \\
+\textbf{Métodos simbólicos} Los métodos numéricos requieren la función de probabilidad conjunta. Estos métodos dan soluciones que se expresan como funciones de los parámetros. Las respuestas a preguntas específicas se obtienen evaluando estas funciones.
+
+\end{frame}
 
 
 \end{document}
