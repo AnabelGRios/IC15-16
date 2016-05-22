@@ -233,8 +233,8 @@ Aquí vamos a dar la idea de algunos de estos métodos, pero cabe destacar que h
 \subsection{Métodos Exactos}
 
 \subsubsection{Propagación de evidencia}
-La propagación de evidencia es una de las tareas más importantes del sistema experto, ya que permite obtener conclusiones cuando se dispone de nueva información. Supóngase un conjunto de variables discretas $X=(X_1,...,X_n)$ y una función de probabilidad $p(x)$, en $X$. Cuando no se dispone de ninguna información, es decir, cuando no existe evidencia, el proceso de propagación consiste en calcular las probabilidades marginales $p(X_i=x_i)$ para cada $X_i \in X$. Estas probabilidades proporcionan información "a priori" sobre los distintos valores que pueden tomar las variables.\\
-Cuando se dispone de cierta evidencia, es decir, de un conjunto de variables $E \subset X$ que tienen asociadas los valores $X_i = e_i$ para $X_i \in E$, el proceso de propagación debe tener en cuenta estos valores para calcular las nuevas probabilidades de los nodos. De esta forma, la propagación de evidencia consiste en calcular las funciones de probabilidad condicionada $p(x_i|e)$ para cada variable $X_i$ dada la evidencia $E=e$.\\
+La propagación de evidencia es una de las tareas más importantes del sistema experto, ya que permite obtener conclusiones cuando se dispone de nueva información. Supóngase un conjunto de variables discretas $X=(X_1,...,X_n)$ y una función de probabilidad $P(x)$, en $X$. Cuando no se dispone de ninguna información, es decir, cuando no existe evidencia, el proceso de propagación consiste en calcular las probabilidades marginales $P(X_i=x_i)$ para cada $X_i \in X$. Estas probabilidades proporcionan información "a priori" sobre los distintos valores que pueden tomar las variables.\\
+Cuando se dispone de cierta evidencia, es decir, de un conjunto de variables $E \subset X$ que tienen asociadas los valores $X_i = e_i$ para $X_i \in E$, el proceso de propagación debe tener en cuenta estos valores para calcular las nuevas probabilidades de los nodos. De esta forma, la propagación de evidencia consiste en calcular las funciones de probabilidad condicionada $P(x_i|e)$ para cada variable $X_i$ dada la evidencia $E=e$.\\
 
 El problema de este método es el elevado número de combinaciones de valores que involucra, lo que lo hace altamente ineficiente, incluso en redes con un número reducido de variables.
 
@@ -255,6 +255,10 @@ Hay una serie de métodos que pueden usarse cuando se presentan ciclos, como el 
 \subsection{Métodos de propagación aproximada}
 
 La idea básica de estos métodos consiste en generar una muestra de tamaño $N$ a partir de la función de probabilidad conjunta de las variables, y luego utilizar la muestra generada para calcular valores aproximados de las probabilidades de ciertos sucesos dada la evidencia. Se pueden separar en dos tipos, los métodos de simulación estocástica, que generan la muestra a partir de la función de probabilidad conjunta usando algunos mecanismos aleatorios, y los métodos de búsqueda determinista, que generan la muestra de forma sistemática.
+
+\subsection{Métodos de propagación simbólica}
+
+Los métodos anteriores requieren que la función de probabilidad conjunta del modelo se especifique numéricamente, es decir, que se asignen valores a todos los parámetros. Esto puede no ser posible, y es en estos casos en los que se utilizan los métodos de propagación simbólica. Estos métodos conducen a soluciones que se expresan como funciones de los parámetros. Por ello, las respuestas a cuestiones generales pueden darse en forma simbólica en función de los parámetros, y las respuestas a preguntas específicas pueden obtenerse sin más que sustituir los valores de los parámetros en la solución simbólica, sin necesidad de rehacer la propagación.
 
 \section{Bibliografía}
 
