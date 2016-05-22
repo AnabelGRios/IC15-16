@@ -1,0 +1,192 @@
+\documentclass[leqno]{beamer}
+\usepackage[spanish,activeacute]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{enumerate}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{tikz}
+
+\usetheme{CambridgeUS}
+\usecolortheme{spruce}
+
+\title{Sistemas expertos probabilísticos}
+\subtitle{Trabajo de puesta al día\\
+			Ingeniería del conocimiento}
+\author{Anabel G\'omez R\'ios, Jacinto Carrasco Castillo}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Introducción}
+ Los sistemas basados en reglas actúan de la manera:
+\begin{center}
+\textbf{SI} \textit{condición} \textbf{ENTONCES} \textit{acción}
+\end{center}
+
+Presentan varios inconvenientes:
+\begin{enumerate}
+\item Mantenimiento de la coherencia: Encadenamientos infinitos y ampliación de la BD.
+\item Dificultad para retractarse por el carácter monótono.
+\item Opacidad: Pérdida de la perspectiva global
+\item Ineficiencia
+\item Manejo de la incertidumbre inherente al conocimiento, hechos o reglas.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Comparación con sistemas expertos basados en reglas}
+
+
+
+\begin{table}[]
+\centering
+\caption{Comparativa}
+\label{comp}
+\resizebox{\textwidth}{!}{\begin{tabular}{|l|l|l|}
+\hline
+                          & Basado en reglas                                                                                                                                           & Basado en probabilidad                                                                                                                                      \\ \hline
+Base de conocimiento      & Hechos+reglas.                                                                                                                                             & \begin{tabular}[c]{@{}l@{}}Espacio de probabilidad: variables, \\ posibles valores, función de probabilidad \\ conjunta. Numerosos parámetros.\end{tabular} \\ \hline
+Motor de inferencia       & \begin{tabular}[c]{@{}l@{}}Más sencillos. Basados en estrategias \\ de inferencia (modus tollens, modus \\ ponens, encadenamiento de reglas).\end{tabular} & \begin{tabular}[c]{@{}l@{}}Evaluación de probabilidades \\ condicionales. Diferentes métodos \\ de evaluación de probabilidades.\end{tabular}               \\ \hline
+Subsistema de explicación & Considerar qué reglas se han activado.                                                                                                                     & \begin{tabular}[c]{@{}l@{}}Explicación basada en los valores \\ relativos de las probabilidades \\ condicionales asociadas a las variables.\end{tabular}    \\ \hline
+Subsistema de aprendizaje & \begin{tabular}[c]{@{}l@{}}Incorporación de nuevos objetos, valores, \\ reglas.\end{tabular}                                                               & \begin{tabular}[c]{@{}l@{}}Modificación del espacio de probabilidad: \\ variables, valores, parámetros.\end{tabular}                                        \\ \hline
+\end{tabular}}
+\end{table}
+\end{frame}
+
+\begin{frame}
+\frametitle{Teoría de la probabilidad}
+
+\textbf{Probabilidad marginal:} $X_1, \dots, X_n$ v.a. discretas, $\{x_1,\dots,x_n\}$ sus valores. La distribución de probabilidad marginal sobre la $i$-ésima variable se obtiene mediante
+	\[	P(x_i) = P(X_i=x_i) = 
+	\sum_{x_1,...,x_{i-1},x_{i+1},...,x_n}P(x_1,...,x_n)	\]
+	
+\textbf{Probabilidad condicionada:}  Sean $X$ e $Y$ conjuntos disjuntos. La distribución de probabilidad condicionada de $X$ dado que $Y=y_j$ viene dada por
+	\[ \forall x_i \in X;\ P(X=x_i | Y = y_j) = P(x_i|y_i) = 
+	\frac{P(x_i,y_j)}{P(y_j)}\]
+
+Por tanto la distribución conjunta puede obtenerse como $P(x_i,y_j) = P(y_j)P(x_i|y_j)$
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Teoría de la probabilidad}
+
+Se dice que $X$ es \textbf{marginalmente independiente} de $Y$ y se nota $I(X,\emptyset,Y)$, si y sólo si para todo valor $x \in X$ e $y \in Y$ se da que $P(x|y)=P(x)$. En caso contrario, lo notamos $\neg I(X,\emptyset,Y)$.\\
+
+Dados $X,Y,Z$ disjuntos, $X$ es \textbf{condicionalmente independiente} de $Y$ conociendo $Z$, $I(X,Z,Y)$, sii $P(x|z,y)= P(x|z)$.\\
+
+\textbf{Teorema de Bayes:} Nos permite representar la probabilidad condicionada $P(y|x)$ por 
+\[P(y|x) = \frac{P(x|y)P(y)}{P(x)} = \frac{P(x|y)P(y)}{\sum\limits_{y\in Y} P(x|y)P(y)}\]
+\end{frame}
+
+\begin{frame}
+\frametitle{Sistemas expertos probabilísticos}
+Si tratamos de realizar una aproximación directa, incluso con un conjunto pequeño de variables, el problema se vuelve intratable debido a la gran cantidad de cálculos. Estos se reducen al usar la independencia, que en muchos de los problemas es conocida a priori. \\
+La idea es codificar el conocimiento de forma que en la misma representación se muestren las dependencias e independencias entre las variables. Dos de estos modelos son las redes de Markov y las redes bayesianas y ambos se apoyan en modelos gráficos para representar dichas dependencias.
+\end{frame}
+
+\begin{frame}
+\frametitle{Redes de Markov}
+Se representan mediante grafos no dirigidos, donde los nodos representan las variables y una relación de dependencia entre dos variables se representa mediante la existencia de un camino entre ellas. Se representan además las relaciones de independencia. En concreto, si $X,Y,Z$ son disjuntos:
+\begin{enumerate}
+\item Si $X$ e $Y$ son marginalmente independientes se representa mediante la inexistencia de un camino entre ambas.
+\item Si existe una relación de independencia condicionada del tipo $I(X,Y,Z)$ se representa por el hecho de que todo camino que conecta las variables de $X$ con las de $Y$ pasan por alguna variable de $Z$. Por tanto, si borramos $Z$, las variables de $X$ e $Y$ quedan desconectadas.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ejemplo: redes de Markov}
+
+\begin{wrapfigure}{l}{0.3\textwidth}
+\includegraphics[width=0.3\textwidth]{ejemplo}
+\caption{Ejemplo} \label{fig:ejemplo}
+\end{wrapfigure}
+
+Como $P(x|y)=\frac{P(x,y)}{P(y)} = \frac{0.245+0.105}{0.03+0.12+0.245+0.105} = \frac{0.35}{0.5} = 0.7$ y $P(x)=0.21+0.14+0.245+0.105 = 0.7$ tenemos que $P(x|y)=P(x)$ y por tanto $X$ es independiente marginalmente a $Y \Rightarrow$ no existe un camino que conecte $X$ con $Y$.\\
+De forma análoga se puede comprobar que $P(x|z)\neq P(x)$ y por tanto existe un camino que conecta $X$ y $Z$ e igualmente con $Z$ e $Y$, y nos queda el grafo:
+\begin{center}
+\begin{tikzpicture}[y=.18cm, x=.18cm,font=\normalsize]
+
+\node[draw, circle] (X) at (10,10) {$X$};
+\node[draw, circle] (Y) at (10,0) {$Y$};
+\node[draw, circle] (Z) at (0,5) {$Z$};
+
+\draw (X) -- (Z);
+\draw (Z) -- (Y);
+
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Problemas de las redes de Markov}
+\begin{center}
+\begin{tikzpicture}[y=.18cm, x=.18cm,font=\normalsize]
+
+\node[draw, circle] (X) at (10,10) {$X$};
+\node[draw, circle] (Y) at (10,0) {$Y$};
+\node[draw, circle] (Z) at (0,5) {$Z$};
+
+\draw (X) -- (Z);
+\draw (Z) -- (Y);
+
+\end{tikzpicture}
+\end{center}
+
+De este grafo podemos deducir que existe un camino que conecta $X$ con $Y$, el que pasa por $Z$, en contra de la primera deducción (que $X$ era marginalmente independiente con $Y$). Estas redes no son por tanto capaces de representar relaciones de independencia no transitivas. La herramienta más potente de los grafos dirigidos que soluciona esto es la que usan las redes bayesianas.
+\end{frame}
+
+\begin{frame}
+\frametitle{Redes bayesianas}
+Permiten representar dos aspectos del conocimiento
+\begin{enumerate}
+\item \textbf{Cualitativo:} Relaciones de dependencia e independencia.
+\item \textbf{Cuantitativo:} Fuerza de las relaciones de relevancia o dependencia.
+\end{enumerate}
+
+\textbf{d-separación} Sean $X,Y,Z$ subconjuntos disjuntos de nodos en $G$ grafo dirigido acíclico. $Z$ \textbf{d-separa} $X$ de $Y$ ($\langle X|Y|Z \rangle_G$) si todos los caminos entre un nodo de $X$ y un nodo de $Y$ pasan por $Z$.\\
+
+Supongamos que hay una dependencia $X \leftarrow Y$. Representamos la incertidumbre de esta relación por la distribución de probabilidad condicionada: $P(Y|X)$. De manera general:
+	\[ P(X_1, \dots,X_n) = \prod\limits_{i=1}^n P(X_i,\Pi(X_i))\]
+	siendo $\Pi(X_i)$ los padres en el grafo de $X_i$
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Redes bayesianas}
+Podemos relacionar este concepto con la independencia condicional:
+\[ \langle X|Y|Z \rangle_G \Leftrightarrow I(X,Y,Z) \]
+
+Una \textbf{red bayesiana} es un par $(G(X,A),P)$, $X$ es el conjunto de vértices (variables), $A$ el conjunto de arcos y $P=\{P(X_1|\Pi_1),\dots,P(X_n|\Pi_n)\}$ es un conjunto de $n$ funciones de probabilidad condicionada, una para cada variable, y $\Pi_i$ es el conjunto de padres de $X_i$ en $G$. $P$ define una probabilidad mediante la factorización
+\[ P(X) = \prod\limits_{i=1}^n P(X_i|\Pi_i)	\]
+Toda relación de independencia de la red es una relación de independencia en la distribución de probabilidad $P(X)$.
+\end{frame}
+
+\begin{frame}
+\frametitle{Redes bayesianas}
+\framesubtitle{Construcción del sistema experto probabilístico}
+
+\begin{enumerate}
+\item \textbf{Planteamiento del problema}
+\item \textbf{Selección de variables} Selección de variables relevantes para el problema.
+\item \textbf{Adquisición de la información cualitativa} El experto muestra las relaciones de dependencia e independencia.
+\item \textbf{Adquisición de la información cuantitativa} Se asignanvalores a la distribución de probabilidad conjunta en cada nodo. 
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Métodos de propagación}
+En las redes bayesianas se hace necesario propagar el impacto de una nueva evidencia de manera consistente.
+\framesubtitle{Métodos exactos}
+\end{frame}
+
+
+
+\end{document}
