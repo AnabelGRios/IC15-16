@@ -67,7 +67,7 @@ Subsistema de aprendizaje & \begin{tabular}[c]{@{}l@{}}Incorporación de nuevos 
 	\sum_{x_1,...,x_{i-1},x_{i+1},...,x_n}P(x_1,...,x_n)	\]
 	
 \textbf{Probabilidad condicionada:}  Sean $X$ e $Y$ conjuntos disjuntos. La distribución de probabilidad condicionada de $X$ dado que $Y=y_j$ viene dada por
-	\[ \forall x_i \in X;\ P(X=x_i | Y = y_j) = P(x_i|y_i) = 
+	\[ \forall x_i \in X;\ P(X=x_i | Y = y_j) = P(x_i|y_j) = 
 	\frac{P(x_i,y_j)}{P(y_j)}\]
 
 Por tanto la distribución conjunta puede obtenerse como $P(x_i,y_j) = P(y_j)P(x_i|y_j)$
@@ -96,7 +96,7 @@ La idea es codificar el conocimiento de forma que en la misma representación se
 Se representan mediante grafos no dirigidos, donde los nodos representan las variables y una relación de dependencia entre dos variables se representa mediante la existencia de un camino entre ellas. Se representan además las relaciones de independencia. En concreto, si $X,Y,Z$ son disjuntos:
 \begin{enumerate}
 \item Si $X$ e $Y$ son marginalmente independientes se representa mediante la inexistencia de un camino entre ambas.
-\item Si existe una relación de independencia condicionada del tipo $I(X,Y,Z)$ se representa por el hecho de que todo camino que conecta las variables de $X$ con las de $Y$ pasan por alguna variable de $Z$. Por tanto, si borramos $Z$, las variables de $X$ e $Y$ quedan desconectadas.
+\item Si existe una relación de independencia condicionada del tipo $I(X,Z,Y)$ se representa por el hecho de que todo camino que conecta las variables de $X$ con las de $Y$ pasan por alguna variable de $Z$. Por tanto, si borramos $Z$, las variables de $X$ e $Y$ quedan desconectadas.
 \end{enumerate}
 \end{frame}
 
