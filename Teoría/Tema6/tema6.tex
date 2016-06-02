@@ -1,0 +1,194 @@
+\documentclass[12pt]{article}
+
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,activeacute]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{enumerate}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{anysize}
+\usepackage{wrapfig}
+
+\marginsize{2cm}{2cm}{2cm}{2cm}
+
+\title{Tema 6: Ontologías}
+\author{Anabel G\'omez R\'ios}
+
+\begin{document}
+\maketitle
+
+\section{Introducción}
+\textbf{Motivación}: ¿Cómo interpreto la frase \textit{El agente cometió un error}? ¿A qué agente estoy haciendo referencia?\\
+
+Hay varios problemas con el manejo de la información: inconsistencia, incompatibilidad, falta de completitud y falta de límites.
+
+\section{Web semántica vs web actual}
+La web actual representa la información utilizando documentos en lenguaje natural con poca estructura. Es de fácil comprensión por los humanos (html sólo define presentación) aunque es difícil soportar el procesamiento automático.\\
+Algunas alternativas para facilitar el procesamiento de la información en la web son las siguientes:
+\begin{enumerate}
+\item Máquinas más inteligentes que comprendan el significado de la información que hay en la web. Procesamiento de lenguaje natural, reconocimiento de imágenes, etc.
+\item Información más inteligente $\rightarrow$ representar la información de modo que sea sencilla de comprender a las máquinas: expresar contenidos en un formato procesable automáticamente y uso de metainformación.
+\end{enumerate}
+
+\textbf{¿Por qué ontologías?} Hay un incremento de la necesidad de capturar el conocimiento, definir vocabulario común (consensuado), compartir entendimiento común (reutilizable) e interpretación y manipulación automática. Todo esto lleva al uso de ontologías.
+
+\section{Orígenes de las ontologías}
+En filosofía una ontología es una parte de la metafísica que trata del ser en general y de sus propiedades trascendentales. En ciencias de la computación algo existe si puede ser representado, descrito y definido (formalmente) para ser interpretado por una máquina.\\
+
+\textbf{Definiciones:}
+\begin{enumerate}
+\item Una especificación de una conceptualización, una descripción de los conceptos y relaciones que pueden existir para un agente o una comunidad de agentes. T.R. Gruber
+\item Una ontología es un catálogo de los tipos de cosas que se asume que existen en un dominio de interés D desde la perspectiva de una persona, la cual usa un lenguaje L para hablar sobre D. John F. Sowa
+\item Una ontología trata sobre la exacta descripción de las cosas y sus relaciones. World Wide Web Consortium (W3C).
+\end{enumerate}
+
+\section{Componentes de una ontología}
+Está compuesta por conceptos o clases, instancias o individuos, propiedades o relaciones y axiomas. Los conceptos son colecciones de individuos (por ejemplo persona, árbol...). Las instancias son objetos del mundo (por ejemplo Joaquín) o valores (integer, string,...). Las propiedades describen las relaciones entre los conceptos. Hay dos tipos de propiedades, de objeto y de datos. Los axiomas son restricciones y meta-información sobre las relaciones. Definen el significado y permiten razonar con la ontología.\\
+
+\textsc{¿Qué aportan las ontologías?}
+\textbf{Clasificación y consultas automáticas}: localizar un concepto o un conjunto de conceptos basándose en la descripción y/o las relaciones e intercambio de vocabulario entre dominios. \textbf{Legible por} humanos y computadoras. \textbf{Chequeo de consistencia}. \textbf{Razonamiento automático}: Subsumpción: inferir que la clase A es más general que la clase B. Reconomiento: inferir que la instancia X debe se un hijo de la clase B.
+
+\section{Clasificación de ontologías}
+\begin{enumerate}
+\item \textbf{Ontologías genéricas}. Conceptos comunes de alto nivel, como por ejemplo \textit{Individuo}, \textit{Conjunto} o \textit{Sustancia}. Son útiles para la reutilización e importantes cuando generamos o analizamos expresiones de LN.
+\item \textbf{Ontologías de dominio}. Utilizan conocimiento específico de dominio y son generalizaciones del dominio.
+\item \textbf{Ontologías orientadas a tareas}. Utilizan conocimiento específico de tareas y son generalización de tareas.
+\item \textbf{Ontologías de aplicación}. Utilizan conceptos comunes de bajo nivel. Combinan, integran y extienden todas las sub-ontologías para una aplicación.
+\end{enumerate}
+
+Las ontologías se usan en web semánticas, inteligencia artificial e IA distribuida, en sistemas expertos y KBS, especificación formal de requerimientos y estándares.\\
+Hay lenguajes para la definición de ontologías: RDF, RDF Schema y OWL.
+
+\section{Estándares básicos}
+\textbf{Unicode} es el estándar que proporciona el medio por el cual codificar un texto en cualquier forma e idioma. IRI (International Resource Identifier) es la cadena de caracteres que identifica inequívocamente un recurso (servicio, página, documento, et.) físico o abstracto. IRI identifica el recurso, pero no tiene por qué localizar su ubicación (URL). XML es un meta-lenguaje extensible de etiquetas usado para el intercambio de datos en la web. El uso de etiquetas con significado es intuitivo para humanos, pero no para las máquinas. XLM estandariza formato, no significado, el nombre de las etiquetas XML no ofrece semántica por sí mismo.\\
+
+\textbf{RDF (Resource Definition Format)} es un estándar W3C para describir recursos (cualquier concepto que tenga una URI) en la web. Utiliza un formato común para describir información que puede ser leído y entendido por una aplicación informática. Permite representar conceptos y relaciones mediante un conjunto de tripletas. Una tripleta describe propiedades de un recurso identificado por una IRI: representa un documento o parte de él, o de una colección de documentos o un objeto. Una propiedad es siempre una IRI (predefinida y con significado preestablecido). Cada tripleta combina un recurso (sujeto), una propiedad (predicado) y un valor para la propiedad (objeto).\\
+RDF permite usar vocabularios semánticos definidos por expertos para describir recursos (dublin core para descripción de recursos digitales o FOAF, ontología para descripción de personas), es representable en forma de documentos XML (serialización RDF/XML) y da la posibilidad de usar lenguajes de consulta sobre tripletas RDF, como SPARQL (sintaxis tipo SQL sobre bases de datos de tripletas) o RDF.DBPEDIA (versión estructurada con tuplasRDF de la wikipedia).\\
+
+\textbf{RDF Schema} es un lenguaje extensible que proporciona los elementos básicos para crear ontologías (vocabularios semánticos RDF). Permite definir clases, relaciones entre clases, restricciones sobre propiedades, etc.
+\begin{enumerate}
+\item rdfs:Class para declarar recursos como clases para otros recursos.
+\item rdfs:subClassOf para definir jerarquías (relaciona clase con superclase).
+\item rdfs:property para definir un subconjunto de recursos RDF que son propiedades.
+\item rdfs:subPropertyOf definir jerarquías de propiedades.
+\item rdfs:domain dominio de una propiedad (clase de recursos que aparecen como sujetos en las tripletas de ese predicado).
+\item rdfs:rage rango de una propiedad (clase de recursos que aparecen como objetos en las tripletas de ese predicado).
+\end{enumerate}
+RDF Schema define el significado de los términos usados en las tripletas RDF.\\
+
+\textbf{OWL (Ontology Web Lenguaje)} extiende a RDFS para permitir la expresión de relaciones complejas entre clases RDFS, y mayor precisión en las restricciones de clases y de propiedades. Deriva de la fusión de los lenguajes de ontologías DAML y OIL. Permite expresar relaciones entre clases, expresar y restringir clases (rango, dominio) y expresar y restringir propiedades (cardinalidad).\\
+Hay tres variantes/sublenguajes, de menor a mayor potencia expresiva:
+\begin{enumerate}
+\item OWL-lite: versión simplificada (representación de jerarquías simples)
+\item OWL-DL: incluye constructores tomados de Description Logics (DL). Busca un compromiso entre máxima expresividad y eficiencia computacional (sólo constructores decidibles de DL).
+\item OWL-full: soporte completo de constructores DL.
+\end{enumerate}
+
+\textbf{Tipos de propiedades}:
+\begin{enumerate}
+\item Propiedades de tipo de dato: relaciones entre instancias de clases y literales RDF y XLM. Esquema de tipo de datos. Por ejemplo, la clase \textit{Mascota} tiene la propiedad de datos \textit{Nombre}.
+\item Relaciones entre instancias de dos clases. Por ejemplo, la clase \textit{DueñoDeMascota} tiene una propiedad objeto \textit{esDueñoDe}.
+\end{enumerate}
+Las propiedades ligan individuos de un dominio a individuos de un rango.\\
+
+\textbf{Constuctores OWL}: intersectionOf, unionOf, complementOf, oneOf, allValuesFrom, someValuesFrom, maxCardinality, minCardinality. AllValuesFrom es el cuantificador universal, para cada instancia de la clase que tiene instancias de una determinada propiedad, los valores de la propiedad son todos miembros de la clase indicada por la cláusula allValuesFrom. SomeValuesFrom es el cuantificador existencial, al menos uno de los valores de la propiedad debe ser miembro de la clase indicada por la cláusula someValuesFrom.\\
+
+\textbf{Axiomas OWL}: subClassOf, equivalentClass, disjointWith, sameIndividualAs, differentFrom, subPropertyOf, equivalentProperty, inverseOf, transitiveProperty, functionalProperty, inverseFunctionalProperty.
+
+\begin{figure}[H]
+ \centering
+  \subfloat[Propiedades simétricas]{
+   \label{f:prop1}
+    \includegraphics[width=0.3\textwidth]{propSimetrica}}
+  \subfloat[Propiedades inversas]{
+   \label{f:prop2}
+    \includegraphics[width=0.3\textwidth]{propInversa}}
+  \subfloat[Propiedades transitivas]{
+   \label{f:prop3}
+    \includegraphics[width=0.25\textwidth]{propTransitiva}}
+ \caption{Propiedades}
+ \label{f:prop11}
+\end{figure}
+
+\begin{figure}[H]
+ \centering
+  \subfloat[Propiedades funcionales]{
+   \label{f:prop4}
+    \includegraphics[width=0.4\textwidth]{propFuncional}}
+  \subfloat[Propiedades funcionales inversas]{
+   \label{f:prop5}
+    \includegraphics[width=0.55\textwidth]{propFuncionalInversa}}
+ \caption{Propiedades}
+ \label{f:prop12}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{disjuncion}
+\caption{Disjunción}
+\label{fig:disjuncion}
+\end{figure}
+
+\section{Razonamiento con ontologías}
+\begin{enumerate}
+\item Clasificación automática
+\begin{figure}[H]
+ \centering
+  \subfloat[]{
+   \label{f:automatica1}
+    \includegraphics[width=0.5\textwidth]{automatica1}}
+  \subfloat[]{
+   \label{f:automatica2}
+    \includegraphics[width=0.4\textwidth]{automatica2}}
+ \caption{Ejemplos de clasificación automática}
+ \label{f:automatica}
+\end{figure}
+\item Clasificación de instancias
+\begin{figure}[H]
+ \centering
+  \subfloat[]{
+   \label{f:instancia1}
+    \includegraphics[width=0.5\textwidth]{instancia1}}
+  \subfloat[]{
+   \label{f:instancia2}
+    \includegraphics[width=0.5\textwidth]{instancia2}}
+ \caption{Ejemplo de clasificación de instancias}
+ \label{f:instancia}
+\end{figure}
+\item Detección de redundancia
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\textwidth]{redundancia}
+\caption{Ejemplo de detección de redundancia}
+\label{fig:redundancia}
+\end{figure}
+\item Chequeo de consistencia (Disjoint y restricciones)
+\begin{figure}[H]
+ \centering
+  \subfloat[]{
+   \label{f:consistencia1}
+    \includegraphics[width=0.5\textwidth]{consistencia1}}
+  \subfloat[]{
+   \label{f:consistencia2}
+    \includegraphics[width=0.5\textwidth]{consistencia2}}
+ \caption{Ejemplos de chequeo de consistencia}
+ \label{f:instancia}
+\end{figure}
+\end{enumerate}
+
+\section{Conclusiones}
+Las ontologías:
+\begin{enumerate}
+\item Definen vocabulario común.
+\item Crean entendimiento compartido.
+\item Proveen acceso común al conocimiento.
+\item Permiten la extracción de nuevo conocimiento implícito a través de razonamiento automático.
+\item Permiten compartir, integrar y re-utilizar conocimiento.
+\item Proveen conocimiento entendible por humanos y computadoras.
+\end{enumerate}
+
+\end{document}
