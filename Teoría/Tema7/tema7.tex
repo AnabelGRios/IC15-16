@@ -1,0 +1,133 @@
+\documentclass[12pt]{article}
+
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,activeacute]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{enumerate}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{anysize}
+\usepackage{wrapfig}
+
+\marginsize{2cm}{2cm}{2cm}{2cm}
+
+\title{Tema 7: Validación y verificación de sistemas basados en el conocimiento}
+\author{Anabel G\'omez R\'ios}
+
+\begin{document}
+\maketitle
+
+\section{Principales errores en el desarrollo de un sistema experto}
+Suelen encontrarse en:
+\begin{enumerate}
+\item Experto: Errores en el conocimiento del experto, tales como conocimiento incorrecto e incompleto.
+\item Ingeniero del conocimiento: Errores semánticos entre el ingeniero y el especialista. Obtención incompleta del conocimiento proveniente del experto.
+\item Base del conocimiento: Errores de sintaxis. Errores de contenido, debido a un conocimiento incorrecto e incompleto y a incertidumbre en las reglas y los hechos.
+\item Motor de inferencia: Errores en la programación. Errores de lógica.
+\end{enumerate}
+
+Un sistema experto de calidad cuenta con las siguientes \textbf{características}: conclusiones correctas, completas y congruentes, confiable respecto a la conclusión, con mecanismos de seguridad y código comprensible y comentado, desempeño adecuado, disponibilidad y base de conocimiento verificada.\\
+
+La \textbf{funcionalidad} del SE es la capacidad del sistema para hacer el trabajo para el cual fue destinado. Debe cubrir las expectativas para lo que fue construido, debe ser confiable respecto a su funcionamiento, debe presentar medios de explicación y debe permitir el módulo de adquisición de conocimiento.
+
+\section{Eficiencia y error de sistemas expertos}
+Un sistema basado en el conocimiento cubre los requisitos de calidad y funcionalidad, con lo que aseguramos la aceptabilidad del SBC. Un sistema experto con un sistema basado en el conocimiento aceptable es un sistema completo y eficiente. Si en el proceso de verificación y validación se comete errores, esto nos trae como consecuencia un SBC mal estructurado, y por lo tanto un sistema experto con errores, incompleto.\\
+
+Para que un sistema experto sea herramienta efectiva, los usuarios deben interactuar de una forma fácil, reuniendo dos capacidades para poder cumplirlo:
+\begin{enumerate}
+\item Explicar sus razonamientos o base del conocimiento: los sistemas expertos se deben realizar siguiendo ciertas reglas o pasos comprensibles de manera que se pueda generar la explicación para cada una de estas reglas, que a la vez se basan en hechos.
+\item Adquisición de nuevos conocimientos o integrados del sistemas: son mecanismos de razonamientos que sirven para modificar los conocimientos anteriores. Sobre la base de lo anterior se puede decir que los sistemas expertos son el producto de investigaciones en el campo de la inteligencia artificial, ya que ésta no intenta sustituir a los expertos humanos, sino que se desea ayudarlos a realizar con más rapidez y eficacia todas las tareas que realiza.
+\end{enumerate}
+
+Las \textbf{diferencias con la ingeniería del software} son las siguientes: mientras que la IS se basa en la ejecución de casos de prueba, la IC sigue criterios para medir su éxito que no son objetivos, tolera la incertidumbre y subjetividad, no se pueden probar fácilmente (comprende grandes espacios de búsqueda) y no existen respuestas \textit{correctas} del sistema.
+
+\section{Verificación}
+\begin{enumerate}
+\item Construir el sistema correctamente.
+\item Descubrir y corregir errores en el SBC desarrollado.
+\item ¿Quién la realiza?
+\item Tipos: estable y dinámica.
+\item Criterios a verificar en una SBC: Consistencia (alcanzar estado en un conflicto con mundo modelizado), precisión (corrección de la sintaxis. Errores morfológicos) y completitud (lagunas en capacidad deductiva).
+\end{enumerate}
+
+\section{Tipos de inconsistencia}
+\textbf{Estructural}: Si no contiene ninguna regla inútil: inalcanzable, un callejón sin salida, no ejecutable o redundante:
+\begin{enumerate}
+\item Duplicación: p y q $\rightarrow$ r; q y p $\rightarrow$ r.
+\item No disparables: p y $\neg$p $\rightarrow$ r.
+\item Ciclos de reglas: p $\rightarrow$ r; r $\rightarrow$ x; p $\rightarrow$ x.
+\end{enumerate}
+\textbf{Lógica}:
+\begin{enumerate}
+\item Reglas con conclusiones o antecedentes redundantes.
+\item Subsunción de reglas (ocultas por otras).
+\item Reglas ejecutables en una misma situación con conclusiones que producen contradicción lógica.
+\end{enumerate}
+\textbf{Semántica}: Valores ilegales en variables. Se precisa un modelo de coherencia para definir conflictos semánticos porque dependen del contexto
+\begin{enumerate}
+\item Coherencia de un patrón: (MiZapato talla 38)
+\item Coherencia de un conjunto de patrones: (MiZapato talla 38) (MiZapato talla 44)
+\item Coherencia de una regla: Si (MiZapato talla 38) Entonces (MiZapato talla 44)
+\item Coherencia de un conjunto de reglas: Encadenamiento de reglas que lleva a afirmar un conjunto de patrones incoherentes.
+\end{enumerate}
+
+\section{Validación}
+Validación es construir el sistema correcto, es una actividad \textit{viva}, no sobre el papel. Según ANSI/IEEE, \textit{evaluar la conformidad con la especificación de requisitos}. En IC, es determinar si el sistema satisface las necesidades del usuario. Se hace con expertos y usuarios, ¿cuándo?\\
+Dos tipos: \textbf{objetiva}: basada en especificaciones formales, e \textbf{interpretativa}: actividades encaminadas a eliminar los errores de tipo conceptual y de contexto. A veces denominada evaluación.\\
+
+\textbf{Cumplir especificaciones del modelo de diseño}:
+\begin{enumerate}
+\item La representación elegida es la adecuada.
+\item La técnica de razonamiento elegida es la apropiada.
+\item Reflejo de modelo conceptual en la implementación.
+\item En el diseño y la implementación se ha pensado en la modularidad.
+\item La comunicación entre los subsistemas es adecuada.
+\item El sistema es fácil de mantener y de comprender.
+\end{enumerate}
+
+\section{Aspectos de la validación}
+\begin{enumerate}
+\item \textbf{¿Qué se está validando?}
+\begin{enumerate}
+\item La comunicación del sistema con otros sistemas (transferencias) es adecuada.
+\item La interfaz es comprensible para el usuario.
+\item La explicación del razonamiento del sistema es suficiente.
+\item Cumple los requisitos de ejecución en tiempo real pedidos.
+\item El sistema cumple las especificaciones de seguridad.
+\item Satisfacción y utilidad de los resultados finales e intermedios comparados con: resultados conocidos, prestaciones de un experto o de un modelo algorítmico.
+\end{enumerate}
+\item \textbf{Metodología de la validación}
+\begin{enumerate}
+\item Informal: reuniones.
+\item Mediante casos de test. Analogía con Turing. ¿Significación y corrección de los casos?
+\item Pruebas de campo. Actuación en paralelo con experto.
+\item Validación de subsistemas.
+\item Análisis de sensibilidad. Sistemas con incertidumbre: cambios provocados.
+\end{enumerate}
+\item \textbf{Criterios de validación}
+\begin{enumerate}
+\item Cuántos casos de prueba.
+\item Cómo se generan estos casos de prueba.
+\item Establecer una proporción entre casos fáciles, medios y difíciles.
+\item Cómo comparar los resultados con los de un experto.
+\item Cómo se mide la realización de un experto humano en ese campo.
+\item Cómo evaluar el sistema cuando distintos expertos opinan distintas cosas.
+\item Si se generan distintas respuestas cómo se consideran.
+\end{enumerate}
+\end{enumerate}
+
+\textbf{Resultados del proceso de validación}: Exactitud y aceptabilidad de soluciones (¿cuántas veces acierta?), adeacuación al problema (¿cubre el dominio?) y errores (por omisión y por comisión).
+
+\section{Pasos de verificación y validación}
+\begin{enumerate}
+\item Verificar si el sistema es completo, preciso y consistente.
+\item Evaluar si el sistema cumple especificaciones del modelo de diseño.
+\item Diseñar un plan de validación aplicando metodologías apropiadas.
+\item Valorar en función de criterios de validación. Entre otros los requisitos funcionales definidos en la fase de identificación del problema.
+\end{enumerate}
+
+\end{document}
