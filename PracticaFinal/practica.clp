@@ -45,6 +45,22 @@
   (field ValorActual)
 )
 
+(deftemplate Noticia
+  (field Nombre)
+  (field Tipo)
+  (field Dias)
+  (field Fecha)
+)
+
+(deftemplate Inestable
+	(field Nombre)
+)
+
+(deftemplate EsPeligroso
+	(field Nombre)
+	(field EsPeligroso)
+)
+
 ; Empieza el módulo para leer los datos de cada valor en el mercado
 (defrule openfile
   (declare (salience 10))
@@ -129,5 +145,133 @@
 ; Termina el módulo para leer los datos de cada sector
 
 ; Empieza el módulo para leer la cartera del usuario
+(defrule openfileCartera
+  (declare (salience 10))
+  =>
+  (open "Cartera.txt" datosCartera)
+  (assert (SeguirLeyendoCartera))
+)
 
+(defrule LeerCarteraFromFile
+  ?f <- (SeguirLeyendoCartera)
+  =>
+  (bind ?NombreCartera (read datosCartera))
+  (retract ?f)
+  (if (neq ?NombreCartera EOF) then
+    (assert (Cartera
+      (Nombre ?NombreCartera)
+      (Acciones  (read datosCartera))
+      (ValorActual (read datosCartera))))
+    (assert (SeguirLeyendoCartera)))
+)
+
+(defrule closefileCartera
+  (declare (salience -10))
+  =>
+  (close datosCartera)
+)
 ; Termina el módulo para leer la cartera del usuario
+
+; Comienza el módulo para leer las noticias
+(defrule openfileCartera
+  (declare (salience 10))
+  =>
+  (open "Noticias.txt" datosNoticias)
+  (assert (SeguirLeyendoNoticias))
+)
+
+(defrule LeerCarteraFromFile
+  ?f <- (SeguirLeyendoNoticias)
+  =>
+  (bind ?NombreNoticia (read datosNoticias))
+  (retract ?f)
+  (if (neq ?NombreNoticia EOF) then
+    (assert (Noticia
+      (Nombre ?NombreNoticia)
+      (Tipo  (read datosNoticias))
+      (Dias (read datosNoticias))
+      (Fecha (read datosNoticias))))
+    (assert (datosNoticias)))
+)
+
+(defrule closefileCartera
+  (declare (salience -10))
+  =>
+  (close datosNoticias)
+)
+; Termina el módulo para leer las noticias
+
+; Empieza el módulo para deducir si un valor es estable o inestable
+; Falta ponerles el orden
+(defrule InestablePorSectorConst
+	(Valor
+		(Nombre ?NV)
+		(Sector Construccion))
+	=>
+	(assert (Inestable
+		(Nombre ?NV)))
+)
+
+(defrule InestablePorEconomia
+	(Sector
+		(Nombre Ibex)
+		(Bajada5Dias true))
+	=>
+	(assert (Inestable
+		(Nombre Servicios)))
+)
+
+(defrule InestablePorSector
+	(Inestable
+		(Nombre ?NS))
+	(Valor
+		(Nombre ?NV)
+		(Sector ?NS))
+	=>
+	(assert (Inestable
+		(Nombre ?NV)))
+)
+
+(defrule EstablePorNoticiaSector
+	(Noticia
+		(Nombre ?NS)
+		(Tipo Buena))
+	(Valor
+		(Nombre ?NV)
+		(Sector ?NS))
+	?Borrar <- (Inestable
+		(Nombre ?NV))
+	=>
+	(retract ?Borrar)
+)
+
+(defrule EstableSectorPorNoticiaSector
+	(Noticia
+		(Nombre ?NS)
+		(Tipo Buena))
+	?Borrar <- (Inestable
+		(Nombre ?NS))
+	=>
+	(retract ?Borrar)
+)
+
+(defrule EstablePorNoticiaValor
+	(Noticia
+		(Nombre ?NV)
+		(Tipo Buena))
+	?Borrar <- (Inestable
+		(Nombre ?NV))
+	=>
+	(retract ?Borrar)
+)
+
+(defrule InestablePorEconomia
+	(Noticia
+		(Nombre Ibex)
+		(Tipo Mala))
+	(Valor
+		(Nombre ?NV))
+	=>
+	(assert Inestable
+		(Nombre ?NV))
+	)
