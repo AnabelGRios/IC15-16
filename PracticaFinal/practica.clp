@@ -56,9 +56,16 @@
 	(field Nombre)
 )
 
-(deftemplate EsPeligroso
+(deftemplate Peligroso
 	(field Nombre)
-	(field EsPeligroso)
+)
+
+(deftemplate Sobrevalorado
+	(field Nombre)
+)
+
+(deftemplate  Infravalorado
+	(field Nombre)
 )
 
 ; Empieza el módulo para leer los datos de cada valor en el mercado
@@ -202,11 +209,12 @@
 ; Termina el módulo para leer las noticias
 
 ; Empieza el módulo para deducir si un valor es estable o inestable
-; Falta ponerles el orden
 (defrule InestablePorSectorConst
 	(Valor
 		(Nombre ?NV)
 		(Sector Construccion))
+	(not (Inestable
+		(Nombre ?NV)))
 	=>
 	(assert (Inestable
 		(Nombre ?NV)))
@@ -216,6 +224,8 @@
 	(Sector
 		(Nombre Ibex)
 		(Bajada5Dias true))
+	(not (Inestable
+		(Nombre Servicios)))
 	=>
 	(assert (Inestable
 		(Nombre Servicios)))
@@ -227,6 +237,8 @@
 	(Valor
 		(Nombre ?NV)
 		(Sector ?NS))
+	(not (Inestable
+		(Nombre ?NV)))
 	=>
 	(assert (Inestable
 		(Nombre ?NV)))
@@ -271,7 +283,101 @@
 		(Tipo Mala))
 	(Valor
 		(Nombre ?NV))
+	(not (Inestable
+		(Nombre ?NV)))
 	=>
-	(assert Inestable
+	(assert (Inestable
+		(Nombre ?NV)))
+)
+
+; Aquí termina el módulo para detectar valores estables e inestables
+
+; Aquí comienza el módulo para detectar valores peligrosos
+(defrule PeligrosoInestable
+	(Cartera
 		(Nombre ?NV))
+	(Inestable
+		(Nombre ?NV))
+	(Valor
+		(Nombre ?NV)
+		(Bajada3Dias true))
+	(not (Peligroso
+		(Nombre ?NV)))
+  =>
+  (assert (Peligroso
+		(Nombre ?NV)))
+)
+
+(defrule PeligrosoBajada5
+	(Cartera
+		(Nombre ?NV))
+	(Valor
+		(Nombre ?NV)
+		(Bajada5Dias true)
+		(Variacion5DiasSectorMenor5 false))
+	(not (Peligroso
+		(Nombre ?NV)))
+	=>
+	(assert (Peligroso
+		(Nombre ?NV)))
+)
+
+; Aquí termina el módulo para detectar valores peligrosos
+
+; Aquí empieza el módulo para detectar valores sobrevalorados
+(defrule SobrevaloradoGeneral
+	(Valor
+		(Nombre ?NV)
+		(EtiquetaPER Alto)
+		(EtiquetaRPD Bajo))
+	=>
+	(assert (Sobrevalorado
+		(Nombre ?NV)))
+)
+
+(defrule SobrevaloradoEmpPeq
+	(Valor
+		(Nombre ?NV)
+		(Tamano PEQUENIA)
+		(EtiquetaPER Alto))
+	=>
+	(assert (Sobrevalorado
+		(Nombre ?NV)))
+)
+
+(defrule SobrevaloradoEmpPeq2
+	(Valor
+		(Nombre ?NV)
+		(Tamano PEQUENIA)
+		(EtiquetaPER Medio)
+		(EtiquetaRPD Bajo))
+	=>
+	(assert (Sobrevalorado
+		(Nombre ?NV)))
+)
+
+(defrule SobrevaloradoEmpGra
+	(Valor
+		(Nombre ?NV)
+		(EtiquetaRPD Bajo)
+		(or (EtiquetaPER Medio) (EtiquetaPER Alto)))
+	=>
+	(assert (Sobrevalorado
+		(Nombre ?NV)))
+)
+
+(defrule SobrevaloradoEmpGra2
+	(Valor
+		(Nombre ?NV)
+		(EtiquetaRPD Medio)
+		(EtiquetaPER Alto))
+	=>
+	(assert (Sobrevalorado
+		(Nombre ?NV)))
+)
+
+; Aquí termina el módulo para detectar valores sobrevalorados
+
+; Aquí empieza el módulo para detectar valores infravalorados
+(defrule InfravaloradoGeneral
 	)
