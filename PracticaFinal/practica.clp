@@ -68,6 +68,12 @@
 	(field Nombre)
 )
 
+(deftemplate Propuesta
+	(field Tipo)
+	(field Rendimiento)
+	(multifield Explicacion)
+)
+
 ; Empieza el módulo para leer los datos de cada valor en el mercado
 (defrule openfile
   (declare (salience 10))
@@ -380,4 +386,55 @@
 
 ; Aquí empieza el módulo para detectar valores infravalorados
 (defrule InfravaloradoGeneral
-	)
+	(Valor
+		(Nombre ?NV)
+		(EtiquetaPER Bajo)
+		(EtiquetaRPD Alto))
+	=>
+	(assert (Infravalorado
+		(Nombre ?NV)))
+)
+
+;Considero subir pero no mucho un 5%
+(defrule InfravaloradoCaida
+	(Valor
+		(Nombre ?NV)
+		(or (< (VariacionPrecio3Meses) -30) (< (VariacionPrecio6Meses) -30) (> (VariacionPrecio1Ano) 30))
+		(> (VariacionPrecio1Mes) 5)
+		(EtiquetaPER Bajo))
+	=>
+	(assert (Infravalorado
+		(Nombre ?NV)))
+)
+
+;Considero no estar bajando que no haya bajado en 5 días
+;Considero que comportarse mejor que su sector es que var5dias - varsector5dias
+;sea positivo
+(defrule InfravaloradoGra
+	(Valor
+		(Nombre ?NV)
+		(EtiquetaRPD Alto)
+		(EtiquetaPER Mediano)
+		(Bajada5Dias false)
+		(> (Variacion5DiasSector) 0))
+	=>
+	(assert (Infravalorado
+		(Nombre ?NV)))
+)
+
+; Aquí termina el módulo para detectar valores infravalorados
+
+; Aquí empieza el módulo de realización de propuestas
+; Aquí empieza el submódulo para proponer invertir en empresas peligrosas
+
+(defrule PropuestaPeligrosa
+	(Peligroso
+		(Nombre ?NV))
+	(Sector
+		(Nombre ?NV)
+		(Variacion1Mes ?VMS))
+	(Valor
+		(Nombre ?NV)
+		(< (VariacionPrecio1Mes) 0)
+		(> (?VMS - VariacionPrecio1Mes) 0)
+		))
