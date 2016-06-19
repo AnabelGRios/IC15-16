@@ -74,6 +74,9 @@
 	(multifield Explicacion)
 )
 
+(deffacts PrecioDelDinero
+	(PrecioDelDinero 0))
+
 ; Empieza el módulo para leer los datos de cada valor en el mercado
 (defrule openfile
   (declare (salience 10))
@@ -425,8 +428,8 @@
 ; Aquí termina el módulo para detectar valores infravalorados
 
 ; Aquí empieza el módulo de realización de propuestas
-; Aquí empieza el submódulo para proponer invertir en empresas peligrosas
 
+; Proponer invertir en empresas peligrosas
 (defrule PropuestaPeligrosa
 	(Peligroso
 		(Nombre ?NV))
@@ -436,5 +439,54 @@
 	(Valor
 		(Nombre ?NV)
 		(< (VariacionPrecio1Mes) 0)
-		(> (?VMS - VariacionPrecio1Mes) 0)
-		))
+		(> (- (?VMS) (VariacionPrecio1Mes)) 3)
+		(RPD ?RPD))
+	(Cartera
+		(> (ValorActual) 0))
+	=>
+	(assert (Propuesta
+		(Tipo ComprarPeligrosa)
+		(Rendimiento (- 20 (?RPD)))
+		(Explicacion "La empresa es peligrosa por... Además está entrando en tendencia
+		 bajista con respecto a su sector. Según mi estimación existe una probabilidad
+		 no despreciable de que pueda caer al cabo del año un 20%, aunque producza un
+		 rpd por dividendos perderíamos un 20-rpd%")))
+)
+
+; Proponer invertir en empresas infravaloradas
+(defrule PropuestaInfravalorada
+	(Infravalorado
+		(Nombre ?NV))
+	(Valor
+		(Nombre ?NV)
+		(PER ?PEREM)
+		(RPD ?RPD))
+	(Cartera
+		(> (ValorActual) 0))
+	(Sector
+		(Nombre Ibex)
+		(PER ?PERM))
+	=>
+	(assert (Propuesta
+		(Tipo ComprarInfravalorado)
+		(Rendimiento (+ (/ (*  (- ?PERM ?PEREM) 20) ?PEREM) ?RPD))
+		(Explicacion "Esta empresa está infravalorada y seguramente el PER tienda al PER
+		medio en 5 años, con lo que debería revalorizar un RE anual a lo que habría que
+		sumar el RPD% de beneficios por dividendos")))
+)
+
+; Proponer vender valores de empresas sobrevaloradas
+; Tomo como rendimineto por año la suma de RPD y la variación del precio en 1 año
+(defrule PropuestaVenderSobrevalorada
+	(Cartera
+		(Nombre ?NV))
+	(Sobrevalorado
+		(Nombre ?NV)
+		(RPD ?RPD)
+		(VariacionPrecio1Ano ?VA))
+	(PrecioDelDinero ?PD)
+	(test (< (+ ?VA ?RPD) (+ 5 ?PD)))
+	=>
+	(assert (Propuesta
+		(Tipo VenderSobrevalorada)
+		(Rendimiento ))))
