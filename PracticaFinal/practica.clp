@@ -49,7 +49,6 @@
   (field Nombre)
   (field Tipo)
   (field Dias)
-  (field Fecha)
 )
 
 (deftemplate Inestable
@@ -58,10 +57,12 @@
 
 (deftemplate Peligroso
 	(field Nombre)
+	(multifield Explicacion)
 )
 
 (deftemplate Sobrevalorado
 	(field Nombre)
+	(multifield Explicacion)
 )
 
 (deftemplate  Infravalorado
@@ -77,15 +78,20 @@
 (deffacts PrecioDelDinero
 	(PrecioDelDinero 0))
 
+	(deftemplate Modulo
+		(field Numero)
+	)
+
 ; Empieza el módulo para leer los datos de cada valor en el mercado
 (defrule openfile
-  (declare (salience 10))
+  (declare (salience 50))
   =>
   (open "Analisis.txt" datosValores)
   (assert (SeguirLeyendoValores))
 )
 
 (defrule LeerValoresCierreFromFile
+	(declare (salience 49))
   ?f <- (SeguirLeyendoValores)
   =>
   (bind ?NombreValor (read datosValores))
@@ -116,7 +122,7 @@
 )
 
 (defrule closefile
-  (declare (salience -10))
+  (declare (salience 48))
   =>
   (close datosValores)
 )
@@ -124,13 +130,14 @@
 
 ; Empieza el módulo para leer los datos de cada sector
 (defrule openfileSectores
-  (declare (salience 10))
+  (declare (salience 47))
   =>
   (open "AnalisisSectores.txt" datosSectores)
   (assert (SeguirLeyendoSectores))
 )
 
 (defrule LeerSectoresFromFile
+	(declare (salience 46))
   ?f <- (SeguirLeyendoSectores)
   =>
   (bind ?NombreSector (read datosSectores))
@@ -154,7 +161,7 @@
 )
 
 (defrule closefileSectores
-  (declare (salience -10))
+  (declare (salience 45))
   =>
   (close datosSectores)
 )
@@ -162,13 +169,14 @@
 
 ; Empieza el módulo para leer la cartera del usuario
 (defrule openfileCartera
-  (declare (salience 10))
+  (declare (salience 44))
   =>
   (open "Cartera.txt" datosCartera)
   (assert (SeguirLeyendoCartera))
 )
 
 (defrule LeerCarteraFromFile
+	(declare (salience 43))
   ?f <- (SeguirLeyendoCartera)
   =>
   (bind ?NombreCartera (read datosCartera))
@@ -182,21 +190,22 @@
 )
 
 (defrule closefileCartera
-  (declare (salience -10))
+  (declare (salience 42))
   =>
   (close datosCartera)
 )
 ; Termina el módulo para leer la cartera del usuario
 
 ; Comienza el módulo para leer las noticias
-(defrule openfileCartera
-  (declare (salience 10))
+(defrule openfileNoticias
+  (declare (salience 41))
   =>
   (open "Noticias.txt" datosNoticias)
   (assert (SeguirLeyendoNoticias))
 )
 
-(defrule LeerCarteraFromFile
+(defrule LeerNoticasFromFile
+	(declare (salience 40))
   ?f <- (SeguirLeyendoNoticias)
   =>
   (bind ?NombreNoticia (read datosNoticias))
@@ -205,61 +214,73 @@
     (assert (Noticia
       (Nombre ?NombreNoticia)
       (Tipo  (read datosNoticias))
-      (Dias (read datosNoticias))
-      (Fecha (read datosNoticias))))
-    (assert (datosNoticias)))
+      (Dias (read datosNoticias))))
+    (assert (SeguirLeyendoNoticias)))
 )
 
-(defrule closefileCartera
-  (declare (salience -10))
+(defrule closefileNoticas
+  (declare (salience 39))
   =>
   (close datosNoticias)
 )
+
 ; Termina el módulo para leer las noticias
 
 ; Empieza el módulo para deducir si un valor es estable o inestable
+(defrule Modulo0
+  (declare (salience 38))
+  =>
+  (assert (Modulo
+		(Numero Cero)))
+)
+
 (defrule InestablePorSectorConst
+	(Modulo
+		(Numero Cero))
 	(Valor
 		(Nombre ?NV)
 		(Sector Construccion))
-	(not (Inestable
-		(Nombre ?NV)))
 	=>
 	(assert (Inestable
 		(Nombre ?NV)))
 )
 
-(defrule InestablePorEconomia
+(defrule InestableServiciosPorEconomia
+	(Modulo
+		(Numero Cero))
 	(Sector
 		(Nombre Ibex)
 		(Bajada5Dias true))
-	(not (Inestable
-		(Nombre Servicios)))
 	=>
 	(assert (Inestable
 		(Nombre Servicios)))
 )
 
 (defrule InestablePorSector
+	(Modulo
+		(Numero Cero))
 	(Inestable
 		(Nombre ?NS))
 	(Valor
 		(Nombre ?NV)
 		(Sector ?NS))
-	(not (Inestable
-		(Nombre ?NV)))
 	=>
 	(assert (Inestable
 		(Nombre ?NV)))
 )
 
 (defrule EstablePorNoticiaSector
+	(Modulo
+		(Numero Cero))
 	(Noticia
 		(Nombre ?NS)
 		(Tipo Buena))
 	(Valor
 		(Nombre ?NV)
 		(Sector ?NS))
+	(not (Noticia
+		(Nombre ?NV)
+		(Tipo Mala)))
 	?Borrar <- (Inestable
 		(Nombre ?NV))
 	=>
@@ -267,6 +288,8 @@
 )
 
 (defrule EstableSectorPorNoticiaSector
+	(Modulo
+		(Numero Cero))
 	(Noticia
 		(Nombre ?NS)
 		(Tipo Buena))
@@ -277,6 +300,8 @@
 )
 
 (defrule EstablePorNoticiaValor
+	(Modulo
+		(Numero Cero))
 	(Noticia
 		(Nombre ?NV)
 		(Tipo Buena))
@@ -286,23 +311,44 @@
 	(retract ?Borrar)
 )
 
+(defrule InestablePorNoticia
+	(Modulo
+		(Numero Cero))
+	(Noticia
+		(Nombre ?NV)
+		(Tipo Mala))
+	=>
+	(assert (Inestable
+		(Nombre ?NV)))
+)
+
 (defrule InestablePorEconomia
+	(Modulo
+		(Numero Cero))
 	(Noticia
 		(Nombre Ibex)
 		(Tipo Mala))
 	(Valor
 		(Nombre ?NV))
-	(not (Inestable
-		(Nombre ?NV)))
 	=>
 	(assert (Inestable
 		(Nombre ?NV)))
+)
+
+(defrule SalirModulo0
+	(declare (salience -1))
+  ?f <- (Modulo (Numero Cero))
+  =>
+  (retract ?f)
+  (assert (Modulo (Numero Uno)))
 )
 
 ; Aquí termina el módulo para detectar valores estables e inestables
 
 ; Aquí comienza el módulo para detectar valores peligrosos
 (defrule PeligrosoInestable
+	(Modulo
+		(Numero Uno))
 	(Cartera
 		(Nombre ?NV))
 	(Inestable
@@ -310,79 +356,122 @@
 	(Valor
 		(Nombre ?NV)
 		(Bajada3Dias true))
-	(not (Peligroso
-		(Nombre ?NV)))
   =>
   (assert (Peligroso
-		(Nombre ?NV)))
+		(Nombre ?NV)
+		(Explicacion "Peligroso porque es inestable y ha estado perdiendo durante los últimos tres días")))
 )
 
 (defrule PeligrosoBajada5
+	(Modulo
+		(Numero Uno))
 	(Cartera
 		(Nombre ?NV))
 	(Valor
 		(Nombre ?NV)
 		(Bajada5Dias true)
 		(Variacion5DiasSectorMenor5 false))
-	(not (Peligroso
-		(Nombre ?NV)))
 	=>
 	(assert (Peligroso
-		(Nombre ?NV)))
+		(Nombre ?NV)
+		(Explicacion "Peligroso porque ha estado perdiendo durante los últimos cinco días y además la variación con el sector ha sido mayor que un -5%")))
+)
+
+(defrule SalirModulo1
+	(declare (salience -1))
+  ?f <- (Modulo (Numero Uno))
+  =>
+  (retract ?f)
+  (assert (Modulo (Numero Dos)))
 )
 
 ; Aquí termina el módulo para detectar valores peligrosos
 
 ; Aquí empieza el módulo para detectar valores sobrevalorados
 (defrule SobrevaloradoGeneral
+	(Modulo
+		(Numero Dos))
 	(Valor
 		(Nombre ?NV)
 		(EtiquetaPER Alto)
 		(EtiquetaRPD Bajo))
+	(not (Sobrevalorado
+		(Nombre ?NV)))
 	=>
 	(assert (Sobrevalorado
-		(Nombre ?NV)))
+		(Nombre ?NV)
+		(Explicacion "Sobrevalorada porque el PER es alto y el RPD bajo")))
 )
 
 (defrule SobrevaloradoEmpPeq
+	(Modulo
+		(Numero Dos))
 	(Valor
 		(Nombre ?NV)
 		(Tamano PEQUENIA)
 		(EtiquetaPER Alto))
+	(not (Sobrevalorado
+		(Nombre ?NV)))
 	=>
 	(assert (Sobrevalorado
-		(Nombre ?NV)))
+		(Nombre ?NV)
+		(Explicacion "Sobrevalorado porque la empresa es pequeña y el PER alto")))
 )
 
 (defrule SobrevaloradoEmpPeq2
+	(Modulo
+		(Numero Dos))
 	(Valor
 		(Nombre ?NV)
 		(Tamano PEQUENIA)
 		(EtiquetaPER Medio)
 		(EtiquetaRPD Bajo))
+	(not (Sobrevalorado
+		(Nombre ?NV)))
 	=>
 	(assert (Sobrevalorado
-		(Nombre ?NV)))
+		(Nombre ?NV)
+		(Explicacion "Sobrevalorada porque es pequeña, tiene el PER medio y el RPD bajo")))
 )
 
 (defrule SobrevaloradoEmpGra
+	(Modulo
+		(Numero Dos))
 	(Valor
 		(Nombre ?NV)
+		(Tamano GRANDE)
 		(EtiquetaRPD Bajo)
-		(or (EtiquetaPER Medio) (EtiquetaPER Alto)))
+		(EtiquetaPER Medio|Alto))
+	(not (Sobrevalorado
+		(Nombre ?NV)))
 	=>
 	(assert (Sobrevalorado
-		(Nombre ?NV)))
+		(Nombre ?NV)
+		(Explicacion "Sobrevalorado porque la empresa es grande, el PER medio o alto y el RPD bajo")))
 )
 
 (defrule SobrevaloradoEmpGra2
+	(Modulo
+		(Numero Dos))
 	(Valor
 		(Nombre ?NV)
+		(Tamano GRANDE)
 		(EtiquetaRPD Medio)
 		(EtiquetaPER Alto))
+	(not (Sobrevalorado
+		(Nombre ?NV)))
 	=>
 	(assert (Sobrevalorado
-		(Nombre ?NV)))
+		(Nombre ?NV)
+		(Explicacion "Sobrevalorado porque es grande, el PER es alto y el RPD mediano")))
+)
+
+(defrule SalirModulo2
+	(declare (salience -1))
+  ?f <- (Modulo (Numero Dos))
+  =>
+  (retract ?f)
+  (assert (Modulo (Numero Tres)))
 )
 
 ; Aquí termina el módulo para detectar valores sobrevalorados
@@ -431,6 +520,8 @@
 
 ; Proponer invertir en empresas peligrosas
 (defrule PropuestaPeligrosa
+	(Modulo
+		(Numero Cuatro))
 	(Peligroso
 		(Nombre ?NV))
 	(Sector
@@ -438,11 +529,14 @@
 		(Variacion1Mes ?VMS))
 	(Valor
 		(Nombre ?NV)
-		(< (VariacionPrecio1Mes) 0)
-		(> (- (?VMS) (VariacionPrecio1Mes)) 3)
+		(VariacionPrecio1Mes ?VP1M)
 		(RPD ?RPD))
 	(Cartera
-		(> (ValorActual) 0))
+		(Nombre Disponible)
+		(ValorActual ?VA))
+	(test (< ?VP1M 0))
+	(test (> (- ?VMS ?VP1M) 3))
+	(test (> ?VA 0))
 	=>
 	(assert (Propuesta
 		(Tipo ComprarPeligrosa)
@@ -455,6 +549,8 @@
 
 ; Proponer invertir en empresas infravaloradas
 (defrule PropuestaInfravalorada
+	(Modulo
+		(Numero Cuatro))
 	(Infravalorado
 		(Nombre ?NV))
 	(Valor
@@ -462,10 +558,12 @@
 		(PER ?PEREM)
 		(RPD ?RPD))
 	(Cartera
-		(> (ValorActual) 0))
+		(Nombre Disponible)
+		(ValorActual ?VA))
 	(Sector
 		(Nombre Ibex)
 		(PER ?PERM))
+	(test (> ?VA 0))
 	=>
 	(assert (Propuesta
 		(Tipo ComprarInfravalorado)
@@ -478,6 +576,8 @@
 ; Proponer vender valores de empresas sobrevaloradas
 ; Tomo como rendimineto por año la suma de RPD y la variación del precio en 1 año
 (defrule PropuestaVenderSobrevalorada
+	(Modulo
+		(Numero Cuatro))
 	(Cartera
 		(Nombre ?NV))
 	(Sobrevalorado
