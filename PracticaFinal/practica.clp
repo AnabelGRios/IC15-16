@@ -67,6 +67,7 @@
 
 (deftemplate  Infravalorado
 	(field Nombre)
+	(multifield Explicacion)
 )
 
 (deftemplate Propuesta
@@ -359,7 +360,7 @@
   =>
   (assert (Peligroso
 		(Nombre ?NV)
-		(Explicacion "Peligroso porque es inestable y ha estado perdiendo durante los últimos tres días")))
+		(Explicacion "peligroso porque es inestable y ha estado perdiendo durante los ultimos tres dias")))
 )
 
 (defrule PeligrosoBajada5
@@ -374,7 +375,7 @@
 	=>
 	(assert (Peligroso
 		(Nombre ?NV)
-		(Explicacion "Peligroso porque ha estado perdiendo durante los últimos cinco días y además la variación con el sector ha sido mayor que un -5%")))
+		(Explicacion "peligroso porque ha estado perdiendo durante los últimos cinco días y además la variación con el sector ha sido mayor que un -5%")))
 )
 
 (defrule SalirModulo1
@@ -400,7 +401,7 @@
 	=>
 	(assert (Sobrevalorado
 		(Nombre ?NV)
-		(Explicacion "Sobrevalorada porque el PER es alto y el RPD bajo")))
+		(Explicacion "sobrevalorada porque el PER es alto y el RPD bajo")))
 )
 
 (defrule SobrevaloradoEmpPeq
@@ -415,7 +416,7 @@
 	=>
 	(assert (Sobrevalorado
 		(Nombre ?NV)
-		(Explicacion "Sobrevalorado porque la empresa es pequeña y el PER alto")))
+		(Explicacion "sobrevalorada porque la empresa es pequeña y el PER alto")))
 )
 
 (defrule SobrevaloradoEmpPeq2
@@ -431,7 +432,7 @@
 	=>
 	(assert (Sobrevalorado
 		(Nombre ?NV)
-		(Explicacion "Sobrevalorada porque es pequeña, tiene el PER medio y el RPD bajo")))
+		(Explicacion "sobrevalorada porque es pequeña, tiene el PER medio y el RPD bajo")))
 )
 
 (defrule SobrevaloradoEmpGra
@@ -447,7 +448,7 @@
 	=>
 	(assert (Sobrevalorado
 		(Nombre ?NV)
-		(Explicacion "Sobrevalorado porque la empresa es grande, el PER medio o alto y el RPD bajo")))
+		(Explicacion "sobrevalorada porque la empresa es grande, el PER medio o alto y el RPD bajo")))
 )
 
 (defrule SobrevaloradoEmpGra2
@@ -463,7 +464,7 @@
 	=>
 	(assert (Sobrevalorado
 		(Nombre ?NV)
-		(Explicacion "Sobrevalorado porque es grande, el PER es alto y el RPD mediano")))
+		(Explicacion "sobrevalorada porque es grande, el PER es alto y el RPD mediano")))
 )
 
 (defrule SalirModulo2
@@ -478,42 +479,62 @@
 
 ; Aquí empieza el módulo para detectar valores infravalorados
 (defrule InfravaloradoGeneral
+	(Modulo
+		(Numero Tres))
 	(Valor
 		(Nombre ?NV)
 		(EtiquetaPER Bajo)
 		(EtiquetaRPD Alto))
 	=>
 	(assert (Infravalorado
-		(Nombre ?NV)))
+		(Nombre ?NV)
+		(Explicacion "infravalorada porque el PER es bajo y el RPD alto")))
 )
 
-;Considero subir pero no mucho un 5%
+;Considero subir pero no mucho un 10%
 (defrule InfravaloradoCaida
+	(Modulo
+		(Numero Tres))
 	(Valor
 		(Nombre ?NV)
-		(or (< (VariacionPrecio3Meses) -30) (< (VariacionPrecio6Meses) -30) (> (VariacionPrecio1Ano) 30))
-		(> (VariacionPrecio1Mes) 5)
+		(VariacionPrecio3Meses ?VP3M)
+		(VariacionPrecio6Meses ?VP6M)
+		(VariacionPrecio1Ano ?VP1A)
+		(VariacionPrecio1Mes ?VP1M)
 		(EtiquetaPER Bajo))
+	(or (< ?VP3M -30) (< ?VP6M -30) (< ?VP1A -30))
+	(test (> ?VP1M 10))
 	=>
 	(assert (Infravalorado
-		(Nombre ?NV)))
+		(Nombre ?NV)
+		(Explicacion "infravalorada porque ha caido en los ultimos 3,6 o 12 meses, ha subido mas de un 10 en el ultimo mes y PER bajo")))
 )
 
 ;Considero no estar bajando que no haya bajado en 5 días
-;Considero que comportarse mejor que su sector es que var5dias - varsector5dias
-;sea positivo
+;Considero que comportarse mejor que su sector es que la variacion de 5 dias con respecto al sector sea menor que 5
 (defrule InfravaloradoGra
+	(Modulo
+		(Numero Tres))
 	(Valor
 		(Nombre ?NV)
+		(Tamano GRANDE)
 		(EtiquetaRPD Alto)
 		(EtiquetaPER Mediano)
 		(Bajada5Dias false)
-		(> (Variacion5DiasSector) 0))
+		(Variacion5DiasSectorMenor5 false))
 	=>
 	(assert (Infravalorado
-		(Nombre ?NV)))
+		(Nombre ?NV)
+		(Explicacion "infravalorada porque es grande, RPD alto, PER mediano, no ha bajado en 5 dias y ha estado mejor que su sector esos 5 dias")))
 )
 
+(defrule SalirModulo3
+	(declare (salience -1))
+  ?f <- (Modulo (Numero Tres))
+  =>
+  (retract ?f)
+  (assert (Modulo (Numero Cuatro)))
+)
 ; Aquí termina el módulo para detectar valores infravalorados
 
 ; Aquí empieza el módulo de realización de propuestas
@@ -523,7 +544,8 @@
 	(Modulo
 		(Numero Cuatro))
 	(Peligroso
-		(Nombre ?NV))
+		(Nombre ?NV)
+		(Explicacion ?Pelig))
 	(Sector
 		(Nombre ?NV)
 		(Variacion1Mes ?VMS))
@@ -538,13 +560,14 @@
 	(test (> (- ?VMS ?VP1M) 3))
 	(test (> ?VA 0))
 	=>
+	(bind ?Rend (- 20 (* 100 ?RPD)))
 	(assert (Propuesta
 		(Tipo ComprarPeligrosa)
-		(Rendimiento (- 20 (?RPD)))
-		(Explicacion "La empresa es peligrosa por... Además está entrando en tendencia
+		(Rendimiento ?Rend)
+		(Explicacion (str-cat "La empresa es " ?Pelig  ", además está entrando en tendencia
 		 bajista con respecto a su sector. Según mi estimación existe una probabilidad
-		 no despreciable de que pueda caer al cabo del año un 20%, aunque producza un
-		 rpd por dividendos perderíamos un 20-rpd%")))
+		 no despreciable de que pueda caer al cabo del año un 20%, aunque produzca un "
+		 ?RPD " por dividendos perderíamos un " ?Rend))))
 )
 
 ; Proponer invertir en empresas infravaloradas
@@ -552,25 +575,27 @@
 	(Modulo
 		(Numero Cuatro))
 	(Infravalorado
-		(Nombre ?NV))
+		(Nombre ?NV)
+		(Explicacion ?Infr))
 	(Valor
 		(Nombre ?NV)
-		(PER ?PEREM)
+		(PER ?PER)
 		(RPD ?RPD))
 	(Cartera
 		(Nombre Disponible)
 		(ValorActual ?VA))
 	(Sector
 		(Nombre Ibex)
-		(PER ?PERM))
+		(PER ?PERMedio))
 	(test (> ?VA 0))
 	=>
+	(bind ?Rend (+ (/ (*  (- ?PERMedio ?PER) 20) ?PER) (* 100 ?RPD)))
 	(assert (Propuesta
 		(Tipo ComprarInfravalorado)
-		(Rendimiento (+ (/ (*  (- ?PERM ?PEREM) 20) ?PEREM) ?RPD))
-		(Explicacion "Esta empresa está infravalorada y seguramente el PER tienda al PER
-		medio en 5 años, con lo que debería revalorizar un RE anual a lo que habría que
-		sumar el RPD% de beneficios por dividendos")))
+		(Rendimiento ?Rend)
+		(Explicacion "Esta empresa esta " ?Infr " y seguramente el PER tienda al PER
+		medio en 5 años, con lo que deberia revalorizar un " ?Rend " anual a lo que habria que
+		sumar el " ?Rend "% de beneficios por dividendos")))
 )
 
 ; Proponer vender valores de empresas sobrevaloradas
@@ -580,13 +605,27 @@
 		(Numero Cuatro))
 	(Cartera
 		(Nombre ?NV))
-	(Sobrevalorado
+	(Valor
 		(Nombre ?NV)
 		(RPD ?RPD)
-		(VariacionPrecio1Ano ?VA))
+		(VariacionPrecio1Ano ?VA)
+		(PER ?PER)
+		(Sector ?NS))
+	(Sector
+		(Nombre ?NS)
+		(PER ?PERMedio))
+	(Sobrevalorado
+		(Nombre ?NV)
+		(Explicacion ?Sobr))
 	(PrecioDelDinero ?PD)
-	(test (< (+ ?VA ?RPD) (+ 5 ?PD)))
+	(test (< (+ ?VA (* 100 ?RPD)) (+ 5 ?PD)))
 	=>
+	(bind ?Rend (+ (* -100 ?RPD) (/ (- ?PER ?PERMedio) (* 5 ?PER))))
 	(assert (Propuesta
 		(Tipo VenderSobrevalorada)
-		(Rendimiento ))))
+		(Rendimiento ?Rend)
+		(Explicacion (str-cat "Esta empresa esta " ?Sobr ", es mejor amortizar lo invertido,
+		ya que seguramente el PER tan alto debera bajar al PER medio del sector en unos 5 anios,
+		con lo que se deberia devaluar un " ?Rend " anual, asi que aunque se pierda el " ?RPD
+		" de beneficios por dividendos, saldria rentable"))))
+)
