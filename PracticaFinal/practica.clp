@@ -546,27 +546,25 @@
 	(Peligroso
 		(Nombre ?NV)
 		(Explicacion ?Pelig))
-	(Sector
-		(Nombre ?NV)
-		(Variacion1Mes ?VMS))
 	(Valor
 		(Nombre ?NV)
 		(VariacionPrecio1Mes ?VP1M)
-		(RPD ?RPD))
+		(RPD ?RPD)
+		(Sector ?NS))
+	(Sector
+		(Nombre ?NS)
+		(Variacion1Mes ?VMS))
 	(Cartera
-		(Nombre Disponible)
-		(ValorActual ?VA))
+		(Nombre ?NV))
 	(test (< ?VP1M 0))
 	(test (> (- ?VMS ?VP1M) 3))
-	(test (> ?VA 0))
 	=>
 	(bind ?Rend (- 20 (* 100 ?RPD)))
 	(assert (Propuesta
-		(Tipo ComprarPeligrosa)
+		(Tipo VenderPeligrosa)
 		(Rendimiento ?Rend)
-		(Explicacion (str-cat "La empresa es " ?Pelig  ", además está entrando en tendencia
-		 bajista con respecto a su sector. Según mi estimación existe una probabilidad
-		 no despreciable de que pueda caer al cabo del año un 20%, aunque produzca un "
+		(Explicacion (str-cat "La empresa es " ?Pelig
+		", además está entrando en tendencia bajista con respecto a su sector. Según mi estimación existe una probabilidad no despreciable de que pueda caer al cabo del año un 20%, aunque produzca un "
 		 ?RPD " por dividendos perderíamos un " ?Rend))))
 )
 
@@ -593,9 +591,9 @@
 	(assert (Propuesta
 		(Tipo ComprarInfravalorado)
 		(Rendimiento ?Rend)
-		(Explicacion "Esta empresa esta " ?Infr " y seguramente el PER tienda al PER
-		medio en 5 años, con lo que deberia revalorizar un " ?Rend " anual a lo que habria que
-		sumar el " ?Rend "% de beneficios por dividendos")))
+		(Explicacion "Esta empresa esta " ?Infr
+		" y seguramente el PER tienda al PER medio en 5 años, con lo que deberia revalorizar un "
+		?Rend " anual a lo que habria que sumar el " ?Rend "% de beneficios por dividendos")))
 )
 
 ; Proponer vender valores de empresas sobrevaloradas
@@ -624,8 +622,47 @@
 	(assert (Propuesta
 		(Tipo VenderSobrevalorada)
 		(Rendimiento ?Rend)
-		(Explicacion (str-cat "Esta empresa esta " ?Sobr ", es mejor amortizar lo invertido,
-		ya que seguramente el PER tan alto debera bajar al PER medio del sector en unos 5 anios,
-		con lo que se deberia devaluar un " ?Rend " anual, asi que aunque se pierda el " ?RPD
-		" de beneficios por dividendos, saldria rentable"))))
+		(Explicacion (str-cat "Esta empresa esta " ?Sobr
+		", es mejor amortizar lo invertido, ya que seguramente el PER tan alto debera bajar al PER medio del sector en unos 5 anios, con lo que se deberia devaluar un "
+		?Rend " anual, asi que aunque se pierda el " ?RPD " de beneficios por dividendos, saldria rentable"))))
 )
+
+; Proponer cambiar una inversión a valores más rentables
+; Tomo por revalorización por año esperado la variación del precio en el año anterior
+; Controlo también además que no tenga ya valores de la empresa que voy a cambiar
+(defrule PropuestaCambio
+	(Modulo
+		(Numero Cuatro))
+	(Valor
+		(Nombre ?Empresa2)
+		(VariacionPrecio1Ano ?VA2)
+		(RPD ?RPD2))
+	(not (Infravalorado
+		(Nombre ?Empresa2)))
+	(Cartera
+		(Nombre ?Empresa2))
+	(Valor
+		(Nombre ?Empresa1)
+		(RPD ?RPD1))
+	(not (Sobrevalorado
+		(Nombre ?Empresa1)))
+	(not (Cartera
+		(Nombre ?Empresa1)))
+	(test (> (* 100 ?RPD1) (+ 1 (+ ?VA2 (* 100 ?RPD2)))))
+	=>
+	(bind ?Rend (- (* 100 ?RPD1) (+ (+ ?VA2 (* 100 ?RPD2)) 1)))
+	(assert (Propuesta
+		(Tipo Cambio)
+		(Rendimiento ?Rend)
+		(Explicacion (str-cat ?Empresa1 " debe tener una revalorizacion acorde con la evolucion de la bolsa. Por dividendos se espera un un "
+		?RPD1 ", que es mas de lo que esta dando " ?Empresa2
+		", por lo que propongo cambiar los valores por los de esta otra, aunque se pague el 1% del coste del cambio saldria rentable"))))
+	)
+
+	(defrule SalirModulo4
+		(declare (salience -1))
+	  ?f <- (Modulo (Numero Cuatro))
+	  =>
+	  (retract ?f)
+	  (assert (Modulo (Numero Cinco)))
+	)
