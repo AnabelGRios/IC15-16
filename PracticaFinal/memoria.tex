@@ -1,0 +1,236 @@
+\documentclass[12pt]{article}
+
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,activeacute]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{enumerate}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+\usepackage{anysize}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{graphicx}
+
+\marginsize{2cm}{2cm}{2cm}{2cm}
+
+\lstset{ %
+escapeinside=||,
+language=python,
+basicstyle=\small}
+
+\title{Ingeniería del Conocimiento:\\
+Práctica Final: Desarrollo de un Sistema Experto para ayudar a un inversor en bolsa.}
+\author{Anabel G\'omez R\'ios.\\
+ DNI: 75929914Z.\\
+ E-mail: anabelgrios@correo.ugr.es}
+
+
+\begin{document}
+\maketitle
+
+\begin{center}
+Curso 2015-2016\\
+
+Grupo de prácticas: Lunes 17:30-19:30\\
+
+Quinto curso del Doble Grado en Ingeniería Informática y Matemáticas.\\
+\textit{ }\\
+\end{center}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Resumen sobre cómo funciona el sistema experto}
+
+\section{Descripción del proceso seguido para el desarrollo}
+
+Paso a detallar lo que he sacado en claro de cada entrevista con el experto y el directivo y los usuarios cuando estuvieron presentes.
+
+\subsection{Sesión 1: Entrevista informal general}
+En esta entrevista han estado presentes directivo, experto y usuarios. Ha sido la primera entrevista, ha sido informal y ha sido principalmente para tener una idea general sobre qué se desea que haga el sistema experto.\\
+
+El \textbf{directivo} nos pide un sistema que ayude a los novatos sobre cómo actuar. Estos agentes tienen una cartera de dinero y tienen que decidir cómo mover las acciones para obtener rentabilidad. Los agentes utilizan muchos datos, tales como el tipo de fondo que se maneja, situación económica actual y situación económica de la cartera de acciones. Quiere que el novato, con darle a un botón, obtenga una proposición de venta o compra de acciones y el por qué de ese razonamiento. Se opera con los datos del Ibex 35 y el proceso suele ser analizar la situación, analizar valores de caída, valores prometedores y situación política, y en base a eso decidir si se invierte o no. Hay también unos valores más estables que otros. Nos pide también que como mucho aparezcan 5 valores en los que invertir o vender (de más importante a menos importante) y que informe también del riesgo de la acción y el beneficio esperado. Nos dice que un valor no puede ocupar más del 50\% de la cartera. Además los valores que tengamos invertidos y que preveamos que van a caer hay que venderlos. Una de las entradas será la cartera actual, que se leerá de un fichero al iniciar el programa. Una vez que se toma una decisión el sistema deberá actualizar la cartera.\\
+
+El \textbf{experto} nos dice que los principales datos de los que se dispone es de la evolución de los valores a 6 meses y a un año, y que los mismos se cogen de la bolsa de Madrid. Además se suele hacer un filtro de los valores prometedores, los que van a tener una caída o los que van a tener una subida. Una vez hecho esto se distinguen los valores que están en caída real o no y los que están en subida real o no.\\
+
+Le pedimos al \textbf{usuario} que sea él el que introduzca la situación política general y particular de cada valor, que acabarán siendo noticias sobre la economía. Nos pide que el programa especifique explícitamente por qué toma cada decisión.\\
+
+El \textbf{esquema conceptual} sacado en claro de esta sesión, es decir, lo que hace el experto a alto nivel, es lo siguiente:
+\begin{enumerate}
+\item Ver si hay que vender algo urgentemente.
+\item Detectar valores prometedores.
+\item Clasificar subidas y bajadas en falsos positivos o positivos.
+\item Detectar valores estables.
+\end{enumerate}
+
+\subsection{Sesión 2: Entrevista formal general}
+Esta segunda entrevista se ha llevado a cabo con el experto y ha sido de tipo formal. Los objetivos de esta sesión han sido obtener el esquema general de funcionamiento del sistema: de qué módulos se compone, el funcionamiento de cada módulo y la interacción entre los módulos.\\
+
+Fases del proceso de cálculo:
+\begin{enumerate}
+\item Detección de valores inestables
+\item Detección de valores peligrosos
+\item Detección de valores infravalorados
+\item Detección de valores sobrevalorados
+\end{enumerate}
+
+Además, tendrá que haber un módulo previo que se encargue de recoger los datos y un módulo posterior que se encargue de proponer las mejores acciones al usuario. El orden de los módulos debe ser este ya que el primer módulo de recogida de datos es necesario para todos los demás, y los valores inestables serán necesarios para calcular los peligrosos, de la misma forma que los peligrosos serán necesarios para calcular los infravalorados y los sobrevalorados. La cartera de acciones son aquellas acciones que en ese momento posee y se introduce de entrada en el sistema. La cartera consta del dinero que tienen libre y el que tiene en acciones y el número de acciones que tiene en cada valor y cuánto dinero sería.\\
+La detección de valores peligrosos buscará aquellos valores que se prevean en caída libre a corto plazo. Los valores prometedores son los valores infravalorados. Para comprar es necesario que haya suficiente dinero en la cartera o vender previamente. Se utilizarán los datos de la bolsa a la hora del cierre del día anterior.
+
+\subsection{Sesión 3: Entrevista formal sobre el módulo de detectar valores peligrosos y el módulo detectar valores inestables}
+Para el módulo de valores inestables se tendrá en cuenta si ha habido noticias malas sobre un valor concreto o sobre un sector (si es sobre el sector se extenderá a todos los valores de ese sector), ya que una noticia mala pondrá un valor inestable durante dos días. Del mismo modo, si un valor era inestables, una noticia buena pondrá dicho valor estable durante dos días. Si hay una noticia sobre un valor y sobre un sector prevalece la noticia sobre el valor. Si hay una noticia buena y una mala sobre un mismo valor, prevalece la buena. Además, los valores del sector de la construcción serán inestables por defecto y si la economía está ajando, los valores del sector servicios serán inestables por defecto.
+
+Es importante tener en cuenta que para el módulo de detectar valores peligrosos es necesario que ya se haya hecho la actualización de valores inestables.\\
+
+Si un valor no es inestable, si considera peligroso si el valor está cayendo durante cinco días y la diferencia entre la variación media del sector y la variación del valor sea mayor del 5\%. Por otro lado, si el valor es inestable y está cayendo durante 3 días, el valor se considera peligroso.
+
+\subsection{Sesión 4: Entrevista formal sobre los módulos de detección de valores infravalorados y sobrevalorados}
+El objetivo de esta sesión ha sido sacar en claro cuándo un valor está infravalorado o sobrevalorado y lo obtenido ha sido lo siguiente:\\
+
+En cuanto al módulo de detección de valores infravalorados, se considerará que un valor lo es si su PER es bajo y el RPD es alto, si la empresa ha caído más de un 30\% en los últimos 3, 6 o 12 meses y ha subido más de un 10\% en el último mes y el PER es bajo o si la empresa es grande, tiene el RPD alto, el PER mediano, no ha bajado en cinco días y la variación con respecto a su sector es mayor que 5.\\
+
+En cuanto al módulo de detección de valore sobrevalorados, un valor lo estará si su PER es alto y el RPD bajo, si la empresa es pequeña y tiene el PER alto o si la empresa es pequeña y tiene el PER mediano pero el RPD bajo. Además, si la empresa es grande, tiene el RPD bajo, el PER mediano o alto, o si la empresa es grande, tiene el RPD medio y el PER alto, también se considerarán valores sobrevalorados.\\
+
+\subsection{Sesión 5: Entrevista formal sobre el módulo de obtener propuestas para el usuario}
+El objetivo de esta sesión es encontrar todas las posibles propuestas que se podrán dar al usuario, en base a los valores que se han obtenido en los módulos anteriores. Por esto, es necesario que este módulo se ejecute después de los cuatro anteriores.
+
+Lo obtenido ha sido que hay cuatro posibles casos en los que conviene comprar o vender valores, que son los siguientes:
+\begin{enumerate}
+\item Si la empresa es peligrosa, ha bajado en el último mes y ha bajado más de un 3\% con respecto a su sector en ese último mes, proponer vender las acciones que se tengan de dicha empresa, ya que habrá posibilidad de que esta empresa caiga al cabo de un año un 20\%.
+\item Si la empresa está infravalorada y se dispone de dinero, comprar acciones de dicha empresa.
+\item Si una empresa está sobrevalorada y el rendimiento por año es menor que 5 más el precio del dinero, proponer vender las acciones que se tengan de dicha empresa.
+\item Si una empresa no está sobrevalorada y su RPD es mayor que la revalorazación por año esperado más su RPD más 1 de una empresa de mi cartera que no está infravalorada y no poseo ya acciones de la primera empresa, proponer cambiar las acciones de las empresas.
+\end{enumerate}
+
+\subsection{Procedimiento de validación y verificación del sistema seguido}
+
+\section{Descripción del sistema desarrollado}
+(El lector debe ser capaz de entender la estructura y modificar o completar la base de conocimiento si lo desea)
+
+\subsection{Variables de entrada del problema}
+Las variables de entrada necesarias serán un fichero llamado \textit{Analisis.txt}, que contendrá los valores de todas las variables necesarias (explicadas a continuación) para cada valor de la bolsa, un fichero llamado \textit{AnalisisSectores.txt} con el valor de las variables para los sectores (también explicadas a continuación), un fichero llamado \textit{Cartera.txt} que contendrá las acciones que tiene el usuario en su cartera, junto con el saldo disponible y por último un fichero llamado \textit{Noticias.txt} que contendrá las noticias que se han dado en los dos últimos días. Además, se le solicitará al usuario si quiere añadir más noticias.\\
+
+Las variables en \textit{Analisis.txt} son las siguientes:
+\begin{enumerate}
+\item \textit{Nombre}: nombre de la empresa.
+\item \textit{Precio}: precio al cierre de la sesión anterior.
+\item \textit{VariacionDiaAnterior}: \% variación del precio con respecto al día anterior.
+\item \textit{Capitalizacion}: valor total de la empresa.
+\item \textit{PER}: Capitalización dividido por beneficios anuales obtenidos por la empresa.
+\item \textit{RPD}: repartido a los accionistas por dividendos (anual).
+\item \textit{Tamano}: toma los valores Pequenio (si el porcentaje del ibex es menor a 2), Mediano (entre 2 y 5) y Grande (mayor de 5).
+\item \textit{PorcentajeIbex}: capitalización con respecto a la capitalización total del ibex.
+\item \textit{EtiquetaPER}: toma los valores Alto si es mayor de 18, Medio si está entre 12 y 18 y Bajo si es menor que 12.
+\item \textit{EtiquetaRPD}: toma los valores Alto si es mayor que el 5\%, Medio si está entre 2 y 5 y Bajo si es menor que el 2\%.
+\item \textit{Sector}: nombre del sector al que pertenece la empresa.
+\item \textit{Variacion5Dias}: \% variación del precio respecto al de hace 5 días.
+\item \textit{Bajada3Dias}: toma los valores true o false según haya estado bajando los últimos 3 días.
+\item \textit{Bajada5Dias}:toma los valores true o false según haya estado bajando los últimos 5 días.
+\item \textit{Variacion5DiasSector}: \% Var 5 dias - \% VarSector 5 dias.
+\item \textit{Variacion5DiasSectorMenor5}: toma los valores true o false según \% variación con respecto al sector en los últimos 5 días sea menor que -5.
+\item \textit{VariacionPrecio1Mes}: \% variación del precio respecto al de hace 1 mes.
+\item \textit{VariacionPrecio3Meses}: \% variación del precio respecto al de hace 3 meses. 
+\item \textit{VariacionPrecio6Meses}: \% variación del precio respecto al de hace 6 meses. 
+\item \textit{VariacionPrecio1Ano}: \% variación del precio respecto al de hace 12 meses. 
+\end{enumerate}
+\textit{ }\\
+
+Las variables en \textit{AnalisisSectores.txt} son las siguientes:
+\begin{enumerate}
+\item \textit{Nombre}: nombre del sector.
+\item \textit{VariacionDia}: media del \% de variación del día en las empresas del sector.
+\item \textit{Capitalizacion}: suma de la capitalización de las empresas del sector.
+\item \textit{PER}: media del PER de las empresas del sector.
+\item \textit{RPD}: \% reparido por dividendos del último año en media de las empresas del sector.
+\item \textit{PorcentajeIbex}: \% capitalización con respecto a la capitalización total de ibex.
+\item \textit{Variacion5Dias}: media \% variación 5 días en las empresas del sector.
+\item \textit{Bajada3Dias}: toma los valores true o false según el sector haya estado bajando los tres últimos días o no.
+\item \textit{Bajada5Dias}: toma los valores true o false según el sector haya estado bajando los cinco últimos días o no.
+\item \textit{Variacion1Mes}: media \% variación del último mes en las empresas del sector.
+\item \textit{Variacion3Meses}: media \% variación del último trimestre en las empresas del sector.
+\item \textit{Variacion6Meses}: media \% variación del último semestre en las empresas del sector.
+\item \textit{Variacion1Ano}: media \% variación de los últimos 12 meses en las empresas del sector.
+\end{enumerate}
+\textit{ }\\
+
+Las variables en \textit{Cartera.txt} son las siguientes:
+\begin{enumerate}
+\item \textit{Nombre}: nombre de la empresa a la que pertenecen las acciones o \textit{Disponible} para el saldo disponible.
+\item \textit{Acciones}: cantidad de acciones poseídas de la empresa.
+\item \textit{ValorActual}: precio actual de las acciones que hay de esa empresa.
+\end{enumerate}
+\textit{ }\\
+
+Las variables en \textit{Noticia.txt} son las siguientes:
+\begin{enumerate}
+\item \textit{Nombre}: Nombre de la empresa a la que hace referencia la noticia.
+\item \textit{Tipo}: toma los valores buena o mala según sea la noticia.
+\end{enumerate}
+
+\subsection{Variables de salida del programa}
+
+\subsection{Conocimiento global del sistema}
+(hechos y relaciones que se cargan inicialmente)
+
+\subsection{Especificación de los módulos que se han desarrollado}
+(incluyendo para cada módulo el objetivo, conocimiento que utiliza y conocimiento que se deduce).
+
+\subsubsection{Módulo Cero}
+\textbf{Objetivo}: \\
+
+\textbf{Conocimiento que utiliza}: \\
+
+\textbf{Conocimiento que se deduce}:
+
+\subsubsection{Módulo Uno}
+\textbf{Objetivo}: \\
+
+\textbf{Conocimiento que utiliza}: \\
+
+\textbf{Conocimiento que se deduce}:
+
+\subsubsection{Módulo Dos}
+\textbf{Objetivo}: \\
+
+\textbf{Conocimiento que utiliza}: \\
+
+\textbf{Conocimiento que se deduce}:
+
+\subsubsection{Módulo Tres}
+\textbf{Objetivo}: \\
+
+\textbf{Conocimiento que utiliza}: \\
+
+\textbf{Conocimiento que se deduce}:
+
+\subsubsection{Módulo Cuatro}
+\textbf{Objetivo}: \\
+
+\textbf{Conocimiento que utiliza}: \\
+
+\textbf{Conocimiento que se deduce}:
+
+\subsubsection{Módulo Cinco}
+\textbf{Objetivo}: \\
+
+\textbf{Conocimiento que utiliza}: \\
+
+\textbf{Conocimiento que se deduce}:
+
+\subsection{Estructura de funcionamiento del esquema de razonamiento del sistema}
+(cuándo actuará cada módulo)
+
+\subsection{Lista de hechos que utiliza el sistema durante su funcionamiento y la forma de representarlos}
+
+\subsection{Hechos y reglas de cada módulo}
+
+\section{Breve manual de uso del sistema}
+
+\end{document}
