@@ -51,6 +51,12 @@
   (field Dias)
 )
 
+(deftemplate NuevaCartera
+	(field Nombre)
+	(field Acciones)
+	(field ValorActual)
+)
+
 (deftemplate Inestable
 	(field Nombre)
 )
@@ -72,6 +78,7 @@
 
 (deftemplate Propuesta
 	(field Tipo)
+	(field Valor)
 	(field Rendimiento)
 	(multifield Explicacion)
 )
@@ -360,7 +367,7 @@
   =>
   (assert (Peligroso
 		(Nombre ?NV)
-		(Explicacion "peligroso porque es inestable y ha estado perdiendo durante los ultimos tres dias")))
+		(Explicacion "peligrosa porque es inestable y ha estado perdiendo durante los ultimos tres dias")))
 )
 
 (defrule PeligrosoBajada5
@@ -375,7 +382,7 @@
 	=>
 	(assert (Peligroso
 		(Nombre ?NV)
-		(Explicacion "peligroso porque ha estado perdiendo durante los últimos cinco días y además la variación con el sector ha sido mayor que un -5%")))
+		(Explicacion "peligrosa porque ha estado perdiendo durante los últimos cinco días y además la variación con el sector ha sido mayor que un -5%")))
 )
 
 (defrule SalirModulo1
@@ -562,8 +569,9 @@
 	(bind ?Rend (- 20 (* 100 ?RPD)))
 	(assert (Propuesta
 		(Tipo VenderPeligrosa)
+		(Valor ?NV)
 		(Rendimiento ?Rend)
-		(Explicacion (str-cat "La empresa es " ?Pelig
+		(Explicacion (str-cat "la empresa es " ?Pelig
 		", además está entrando en tendencia bajista con respecto a su sector. Según mi estimación existe una probabilidad no despreciable de que pueda caer al cabo del año un 20%, aunque produzca un "
 		 ?RPD " por dividendos perderíamos un " ?Rend))))
 )
@@ -580,7 +588,7 @@
 		(PER ?PER)
 		(RPD ?RPD))
 	(Cartera
-		(Nombre Disponible)
+		(Nombre DISPONIBLE)
 		(ValorActual ?VA))
 	(Sector
 		(Nombre Ibex)
@@ -590,10 +598,11 @@
 	(bind ?Rend (+ (/ (*  (- ?PERMedio ?PER) 20) ?PER) (* 100 ?RPD)))
 	(assert (Propuesta
 		(Tipo ComprarInfravalorado)
+		(Valor ?NV)
 		(Rendimiento ?Rend)
-		(Explicacion "Esta empresa esta " ?Infr
+		(Explicacion (str-cat "esta empresa esta " ?Infr
 		" y seguramente el PER tienda al PER medio en 5 años, con lo que deberia revalorizar un "
-		?Rend " anual a lo que habria que sumar el " ?Rend "% de beneficios por dividendos")))
+		?Rend " anual a lo que habria que sumar el " ?Rend "% de beneficios por dividendos"))))
 )
 
 ; Proponer vender valores de empresas sobrevaloradas
@@ -621,8 +630,9 @@
 	(bind ?Rend (+ (* -100 ?RPD) (/ (- ?PER ?PERMedio) (* 5 ?PER))))
 	(assert (Propuesta
 		(Tipo VenderSobrevalorada)
+		(Valor ?NV)
 		(Rendimiento ?Rend)
-		(Explicacion (str-cat "Esta empresa esta " ?Sobr
+		(Explicacion (str-cat "esta empresa esta " ?Sobr
 		", es mejor amortizar lo invertido, ya que seguramente el PER tan alto debera bajar al PER medio del sector en unos 5 anios, con lo que se deberia devaluar un "
 		?Rend " anual, asi que aunque se pierda el " ?RPD " de beneficios por dividendos, saldria rentable"))))
 )
@@ -653,6 +663,7 @@
 	(bind ?Rend (- (* 100 ?RPD1) (+ (+ ?VA2 (* 100 ?RPD2)) 1)))
 	(assert (Propuesta
 		(Tipo Cambio)
+		(Valor (str-cat ?Empresa2 " por " ?Empresa1))
 		(Rendimiento ?Rend)
 		(Explicacion (str-cat ?Empresa1 " debe tener una revalorizacion acorde con la evolucion de la bolsa. Por dividendos se espera un un "
 		?RPD1 ", que es mas de lo que esta dando " ?Empresa2
@@ -665,4 +676,142 @@
 	  =>
 	  (retract ?f)
 	  (assert (Modulo (Numero Cinco)))
+		(assert (ContadorMostradas 0))
 	)
+
+; Aquí termina el módulo de realización de propuestas
+
+; Aquí empieza el módulo de elección de propuestas. En este módulo se van a elegir las
+; cinco mejores propuestas (aquellas que tengan mejor rendimiento) y se preguntará al
+; usuario si quiere comprar/vender y cuántas acciones
+(defrule FindMax
+	(Modulo
+		(Numero Cinco))
+	(ContadorMostradas ?CM)
+  (Propuesta
+		(Valor ?NV1)
+		(Rendimiento ?R1))
+  (not  (and (Propuesta (Rendimiento ?R2)) (test(> ?R2 ?R1))))
+	(test (< ?CM 5))
+  =>
+  (assert (Max ?NV1 ?R1))
+)
+
+(defrule MostrarMax
+	(Modulo
+		(Numero Cinco))
+	?f <- (Max ?NV ?R)
+	?f3 <- (Propuesta
+		(Valor ?NV)
+		(Tipo ?T)
+		(Explicacion ?Exp))
+	?f2 <- (ContadorMostradas ?CM)
+	=>
+	(bind ?CM2 (+ ?CM 1))
+	(printout t "Se recomienda una propuesta de tipo " ?T " " ?NV " con rendimiento " ?R " ya que " ?Exp crlf)
+	(retract ?f)
+	(retract ?f2)
+	(retract ?f3)
+	(assert (ContadorMostradas ?CM2))
+)
+
+(defrule PedirAccion
+	(declare (salience -1))
+	(Modulo
+		(Numero Cinco))
+	=>
+	(printout t "¿Desea realizar alguna de estas acciones? Introduzca Vender para una propuesta
+	de tipo vender, Comprar para una propuesta de tipo comprar, Cambio para una propuesta de tipo
+	Cambio y No para no realizar ninguna accion." crlf)
+	(bind ?Respuesta (read))
+	(assert (RespuestaUsuario ?Respuesta))
+)
+
+(defrule PedirAccionVender
+	(Modulo
+		(Numero Cinco))
+	?f <- (RespuestaUsuario Vender)
+	=>
+	(printout t "Indique que valor desea vender" crlf)
+	(bind ?ValorVender (read))
+	(printout t "Indique cuantas acciones desea vender" crlf)
+	(bind ?NumAcciones (read))
+	(assert (Vender ?ValorVender ?NumAcciones))
+	(retract ?f)
+)
+
+(defrule PedirAccionComprar
+	(Modulo
+		(Numero Cinco))
+	?f <- (RespuestaUsuario Comprar)
+	=>
+	(printout t "Indique que valor desea comprar" crlf)
+	(bind ?ValorComprar (read))
+	(printout t "Indique cuantas acciones desea comprar" crlf)
+	(bind ?NumAcciones (read))
+	(assert (Comprar ?ValorComprar ?NumAcciones))
+	(retract ?f)
+)
+
+(defrule PedirAccionCambio
+	(Modulo
+		(Numero Cinco))
+	?f <- (RespuestaUsuario Cambio)
+	=>
+	(printout t "Indique que valor desea vender" crlf)
+	(bind ?ValorVender (read))
+	(printout t "Indique cuantas acciones desea vender" crlf)
+	(bind ?NumAccionesVender (read))
+	(printout t "Indique que valor desea comprar" crlf)
+	(bind ?ValorComprar (read))
+	(printout t "Indique cuantas acciones desea comprar" crlf)
+	(bind ?NumAccionesComprar (read))
+	(assert (Cambio ?ValorVender ?NumAccionesVender ?ValorComprar ?NumAccionesComprar))
+	(retract ?f)
+)
+
+(defrule CambiarCarteraVender
+	(declare (salience -1))
+	(Modulo
+		(Numero Cinco))
+	?f <- (Vender ?ValorVender ?NumAcciones)
+	?f2 <- (Cartera
+		(Nombre ?ValorVender)
+		(Acciones ?NA))
+	(Valor
+		(Nombre ?ValorVender)
+		(Precio ?Precio))
+	?f3 <- (Cartera
+		(Nombre DISPONIBLE)
+		(Acciones ?DisponibleActual))
+	(test (<= ?NumAcciones ?NA))
+	=>
+	(bind ?Dif (- ?NA ?NumAcciones))
+	(bind ?NuevoDisponible (+ ?DisponibleActual (* ?NumAcciones ?Precio)))
+	(bind ?NuevaCantidadEnValor (* ?Dif ?Precio))
+	(retract ?f)
+	(retract ?f2)
+	(retract ?f3)
+	(assert (Cartera
+		(Nombre DISPONIBLE)
+		(Acciones ?NuevoDisponible)
+		(ValorActual ?NuevoDisponible)))
+	(if (> ?Dif 0) then
+		(assert (Cartera
+			(Nombre ?ValorVender)
+			(Acciones ?Dif)
+			(ValorActual ?NuevaCantidadEnValor))))
+)
+
+(defrule SalirModulo5
+	(declare (salience -2))
+	?f <- (Modulo (Numero Cinco))
+	?f2 <- (ContadorMostradas 5)
+	?f3 <- (RespuestaUsuario No)
+	=>
+	(retract ?f)
+	(retract ?f2)
+	(assert (Modulo (Numero Seis)))
+)
+
+; Aquí termina el módulo de elección de propuestas
