@@ -722,7 +722,7 @@
 	=>
 	(printout t "¿Desea realizar alguna de estas acciones? Introduzca Vender para una propuesta
 	de tipo vender, Comprar para una propuesta de tipo comprar, Cambio para una propuesta de tipo
-	Cambio y No para no realizar ninguna accion." crlf)
+	Cambio y Salir para no realizar ningún movimiento y salir." crlf)
 	(bind ?Respuesta (read))
 	(assert (RespuestaUsuario ?Respuesta))
 )
@@ -766,7 +766,8 @@
 	(bind ?ValorComprar (read))
 	(printout t "Indique cuantas acciones desea comprar" crlf)
 	(bind ?NumAccionesComprar (read))
-	(assert (Cambio ?ValorVender ?NumAccionesVender ?ValorComprar ?NumAccionesComprar))
+	(assert (Vender ?ValorVender ?NumAccionesVender))
+	(assert (Comprar ?ValorComprar ?NumAccionesComprar))
 	(retract ?f)
 )
 
@@ -803,15 +804,126 @@
 			(ValorActual ?NuevaCantidadEnValor))))
 )
 
-(defrule SalirModulo5
+(defrule ErrorVender
+	(declare (salience -1))
+	(Modulo
+		(Numero Cinco))
+	?f <- (Vender ?ValorVender ?NumAcciones)
+	(Cartera
+		(Nombre ?ValorVender)
+		(Acciones ?NA))
+	(test (> ?NumAcciones ?NA))
+	=>
+	(retract ?f)
+	(printout t "No se disponen de tantas acciones como desea vender" clrf)
+)
+
+(defrule CambiarCarteraComprar
 	(declare (salience -2))
+	(Modulo
+		(Numero Cinco))
+	?f <- (Comprar ?ValorComprar ?NumAcciones)
+	(Valor
+		(Nombre ?ValorComprar)
+		(Precio ?Precio))
+	?f2 <- (Cartera
+		(Nombre DISPONIBLE)
+		(Acciones ?DisponibleActual))
+	(not (Cartera
+		(Nombre ?ValorComprar)))
+	(test (<= (* ?NumAcciones ?Precio) ?DisponibleActual))
+	=>
+	(bind ?NuevaCantidad (* ?NumAcciones ?Precio))
+	(bind ?NuevoDisponible (- ?DisponibleActual (* ?NumAcciones ?Precio)))
+	(retract ?f)
+	(retract ?f2)
+	(assert (Cartera
+		(Nombre DISPONIBLE)
+		(Acciones ?NuevoDisponible)
+		(ValorActual ?NuevoDisponible)))
+	(assert (Cartera
+		(Nombre ?ValorComprar)
+		(Acciones ?NumAcciones)
+		(ValorActual ?NuevaCantidad)))
+)
+
+(defrule CambiarCarteraComprarExistente
+	(declare (salience -2))
+	(Modulo
+		(Numero Cinco))
+	?f <- (Comprar ?ValorComprar ?NumAcciones)
+	(Valor
+		(Nombre ?ValorComprar)
+		(Precio ?Precio))
+	?f2 <- (Cartera
+		(Nombre DISPONIBLE)
+		(Acciones ?DisponibleActual))
+	?f3 <- (Cartera
+		(Nombre ?ValorComprar)
+		(Acciones ?NumAccionesActual))
+	(test (<= (* ?NumAcciones ?Precio) ?DisponibleActual))
+	=>
+	(bind ?NuevaCantidad (* (+ ?NumAccionesActual ?NumAcciones) ?Precio))
+	(bind ?NuevoDisponible (- ?DisponibleActual (* ?NumAcciones ?Precio)))
+	(bind ?NuevasAcciones (+ ?NumAcciones ?NumAccionesActual))
+	(retract ?f)
+	(retract ?f2)
+	(retract ?f3)
+	(assert (Cartera
+		(Nombre DISPONIBLE)
+		(Acciones ?NuevoDisponible)
+		(ValorActual ?NuevoDisponible)))
+	(assert (Cartera
+		(Nombre ?ValorComprar)
+		(Acciones ?NuevasAcciones)
+		(ValorActual ?NuevaCantidad)))
+)
+
+(defrule ErrorComprar
+	(declare (salience -2))
+	(Modulo
+		(Numero Cinco))
+	?f <- (Comprar ?ValorComprar ?NumAcciones)
+	(Valor
+		(Nombre ?ValorComprar)
+		(Precio ?Precio))
+	(Cartera
+		(Nombre DISPONIBLE)
+		(Acciones ?DisponibleActual))
+	(test (> (* ?NumAcciones ?Precio) ?DisponibleActual))
+	=>
+	(retract ?f)
+	(printout t "No se dispone de dinero suficiente para comprar tantas acciones" crlf)
+)
+
+(defrule EliminarPropuestas
+	(declare (salience -3))
+	(Modulo
+		(Numero Cinco))
+	?f <- (Propuesta
+		(Valor ?NV))
+	=>
+	(retract ?f)
+	(assert (Volver Modulo1))
+)
+
+(defrule SalirModulo5
+	(declare (salience -4))
 	?f <- (Modulo (Numero Cinco))
 	?f2 <- (ContadorMostradas 5)
-	?f3 <- (RespuestaUsuario No)
+	?f3 <- (Volver Modulo1)
 	=>
 	(retract ?f)
 	(retract ?f2)
-	(assert (Modulo (Numero Seis)))
+	(retract ?f3)
+	(assert (Modulo (Numero Uno)))
 )
+
+(defrule SalirPrograma
+	(declare (salience -2))
+	(Modulo (Numero Cinco))
+	(RespuestaUsuario Salir)
+	=>
+	(exit))
 
 ; Aquí termina el módulo de elección de propuestas
