@@ -921,9 +921,49 @@
 
 (defrule SalirPrograma
 	(declare (salience -2))
-	(Modulo (Numero Cinco))
-	(RespuestaUsuario Salir)
+	?f <- (Modulo (Numero Cinco))
+	?f2 <- (RespuestaUsuario Salir)
 	=>
-	(exit))
+	(retract ?f)
+	(retract ?f2)
+	(assert (Modulo (Numero Salir))))
 
 ; Aquí termina el módulo de elección de propuestas
+
+; Aquí empieza el módulo para reescribir la cartera y salir del programa
+(defrule openfileNuevaCartera
+  (declare (salience 3))
+  =>
+  (open "Cartera.txt" datosCartera)
+  (assert (GuardarValores))
+)
+
+(defrule GuardarNuevaCartera
+  (declare (salience 2))
+	(GuardarValores)
+  (Modulo (Numero Salir))
+  (Cartera
+    (Nombre ?NV)
+    (Acciones ?Acc)
+    (ValorActual ?VA))
+  =>
+  (printout datosCartera crlf (str-cat ?NV " " ?Acc " " ?VA))
+)
+
+(defrule CerrarNuevaCartera
+  (declare (salience 1))
+  (Modulo (Numero Salir))
+	?f <- (GuardarValores)
+  =>
+	(retract ?f)
+  (close datosCartera)
+)
+
+(defrule Salir
+	(Modulo (Numero Salir))
+	(not (GuardarValores))
+	=>
+	(exit)
+)
+
+; Aquí terminar el módulo para reescribir la cartera y salir del programa
