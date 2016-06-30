@@ -378,7 +378,7 @@
 	(Valor
 		(Nombre ?NV)
 		(Bajada5Dias true)
-		(Variacion5DiasSectorMenor5 false))
+		(Variacion5DiasSectorMenor5 true))
 	=>
 	(assert (Peligroso
 		(Nombre ?NV)
@@ -498,7 +498,7 @@
 		(Explicacion "infravalorada porque el PER es bajo y el RPD alto")))
 )
 
-;Considero subir pero no mucho un 10%
+;Considero subir pero no mucho subir entre un 5% y un 10%
 (defrule InfravaloradoCaida
 	(Modulo
 		(Numero Tres))
@@ -510,7 +510,8 @@
 		(VariacionPrecio1Mes ?VP1M)
 		(EtiquetaPER Bajo))
 	(or (< ?VP3M -30) (< ?VP6M -30) (< ?VP1A -30))
-	(test (> ?VP1M 10))
+	(test (< ?VP1M 10))
+	(test (> ?VP1M 5))
 	=>
 	(assert (Infravalorado
 		(Nombre ?NV)
@@ -546,7 +547,7 @@
 
 ; Aquí empieza el módulo de realización de propuestas
 
-; Proponer invertir en empresas peligrosas
+; Proponer vender acciones de empresas peligrosas
 (defrule PropuestaPeligrosa
 	(Modulo
 		(Numero Cuatro))
@@ -564,7 +565,7 @@
 	(Cartera
 		(Nombre ?NV))
 	(test (< ?VP1M 0))
-	(test (> (- ?VMS ?VP1M) 3))
+	(test (< (- ?VP1M ?VMS) -3))
 	=>
 	(bind ?Rend (- 20 (* 100 ?RPD)))
 	(assert (Propuesta
@@ -595,7 +596,7 @@
 		(PER ?PERMedio))
 	(test (> ?VA 0))
 	=>
-	(bind ?Rend (+ (/ (*  (- ?PERMedio ?PER) 20) ?PER) (* 100 ?RPD)))
+	(bind ?Rend (+ (/ (* (- ?PERMedio ?PER) 20) ?PER) (* 100 ?RPD)))
 	(assert (Propuesta
 		(Tipo ComprarInfravalorado)
 		(Valor ?NV)
@@ -627,7 +628,7 @@
 	(PrecioDelDinero ?PD)
 	(test (< (+ ?VA (* 100 ?RPD)) (+ 5 ?PD)))
 	=>
-	(bind ?Rend (+ (* -100 ?RPD) (/ (- ?PER ?PERMedio) (* 5 ?PER))))
+	(bind ?Rend (+ (* -100 ?RPD) (/ (* 100 (- ?PER ?PERMedio)) (* 5 ?PER))))
 	(assert (Propuesta
 		(Tipo VenderSobrevalorada)
 		(Valor ?NV)
@@ -720,9 +721,9 @@
 	(Modulo
 		(Numero Cinco))
 	=>
-	(printout t "¿Desea realizar alguna de estas acciones? Introduzca Vender para una propuesta
-	de tipo vender, Comprar para una propuesta de tipo comprar, Cambio para una propuesta de tipo
-	Cambio y Salir para no realizar ningún movimiento y salir." crlf)
+	(printout t "¿Desea realizar alguna de estas acciones u otra accion distinta? Introduzca Vender para una accion
+	de tipo vender, Comprar para una accion de tipo comprar, Cambio para una cambio de tipo
+	Cambio y Salir para no realizar ningun movimiento y salir." crlf)
 	(bind ?Respuesta (read))
 	(assert (RespuestaUsuario ?Respuesta))
 )
@@ -736,8 +737,12 @@
 	(bind ?ValorVender (read))
 	(printout t "Indique cuantas acciones desea vender" crlf)
 	(bind ?NumAcciones (read))
+	(printout t "¿Desea que se vuelvan a producir propuestas para mas cambios o desea salir del programa?
+	Introduzca Salir para salir y cualquier otra tecla para continuar" crlf)
+	(bind ?Respuesta (read))
 	(assert (Vender ?ValorVender ?NumAcciones))
 	(retract ?f)
+	(if (eq ?Respuesta Salir) then (assert (RespuestaUsuario Salir)))
 )
 
 (defrule PedirAccionComprar
@@ -749,8 +754,12 @@
 	(bind ?ValorComprar (read))
 	(printout t "Indique cuantas acciones desea comprar" crlf)
 	(bind ?NumAcciones (read))
+	(printout t "¿Desea que se vuelvan a producir propuestas para mas cambios o desea salir del programa?
+	Introduzca Salir para salir y cualquier otra tecla para continuar" crlf)
+	(bind ?Respuesta (read))
 	(assert (Comprar ?ValorComprar ?NumAcciones))
 	(retract ?f)
+	(if (eq ?Respuesta Salir) then (assert (RespuestaUsuario Salir)))
 )
 
 (defrule PedirAccionCambio
@@ -766,9 +775,13 @@
 	(bind ?ValorComprar (read))
 	(printout t "Indique cuantas acciones desea comprar" crlf)
 	(bind ?NumAccionesComprar (read))
+	(printout t "¿Desea que se vuelvan a producir propuestas para mas cambios o desea salir del programa?
+	Introduzca Salir para salir y cualquier otra tecla para continuar" crlf)
+	(bind ?Respuesta (read))
 	(assert (Vender ?ValorVender ?NumAccionesVender))
 	(assert (Comprar ?ValorComprar ?NumAccionesComprar))
 	(retract ?f)
+	(if (eq ?Respuesta Salir) then (assert (RespuestaUsuario Salir)))
 )
 
 (defrule CambiarCarteraVender
@@ -788,7 +801,7 @@
 	(test (<= ?NumAcciones ?NA))
 	=>
 	(bind ?Dif (- ?NA ?NumAcciones))
-	(bind ?NuevoDisponible (+ ?DisponibleActual (* ?NumAcciones ?Precio)))
+	(bind ?NuevoDisponible (+ ?DisponibleActual (* ?NumAcciones ?Precio 0.995)))
 	(bind ?NuevaCantidadEnValor (* ?Dif ?Precio))
 	(retract ?f)
 	(retract ?f2)
@@ -831,10 +844,10 @@
 		(Acciones ?DisponibleActual))
 	(not (Cartera
 		(Nombre ?ValorComprar)))
-	(test (<= (* ?NumAcciones ?Precio) ?DisponibleActual))
+	(test (<= (* ?NumAcciones ?Precio 1.005) ?DisponibleActual))
 	=>
 	(bind ?NuevaCantidad (* ?NumAcciones ?Precio))
-	(bind ?NuevoDisponible (- ?DisponibleActual (* ?NumAcciones ?Precio)))
+	(bind ?NuevoDisponible (- ?DisponibleActual (* ?NumAcciones ?Precio 1.005)))
 	(retract ?f)
 	(retract ?f2)
 	(assert (Cartera
@@ -861,10 +874,10 @@
 	?f3 <- (Cartera
 		(Nombre ?ValorComprar)
 		(Acciones ?NumAccionesActual))
-	(test (<= (* ?NumAcciones ?Precio) ?DisponibleActual))
+	(test (<= (* ?NumAcciones ?Precio) ?DisponibleActual 1.005))
 	=>
 	(bind ?NuevaCantidad (* (+ ?NumAccionesActual ?NumAcciones) ?Precio))
-	(bind ?NuevoDisponible (- ?DisponibleActual (* ?NumAcciones ?Precio)))
+	(bind ?NuevoDisponible (- ?DisponibleActual (* ?NumAcciones ?Precio 1.005)))
 	(bind ?NuevasAcciones (+ ?NumAcciones ?NumAccionesActual))
 	(retract ?f)
 	(retract ?f2)
@@ -902,6 +915,7 @@
 		(Numero Cinco))
 	?f <- (Propuesta
 		(Valor ?NV))
+	(not (RespuestaUsuario Salir))
 	=>
 	(retract ?f)
 	(assert (Volver Modulo1))
@@ -920,7 +934,7 @@
 )
 
 (defrule SalirPrograma
-	(declare (salience -2))
+	(declare (salience -4))
 	?f <- (Modulo (Numero Cinco))
 	?f2 <- (RespuestaUsuario Salir)
 	=>
@@ -933,8 +947,9 @@
 ; Aquí empieza el módulo para reescribir la cartera y salir del programa
 (defrule openfileNuevaCartera
   (declare (salience 3))
+	(Modulo (Numero Salir))
   =>
-  (open "Cartera.txt" datosCartera)
+  (open "Cartera.txt" datosCartera "w")
   (assert (GuardarValores))
 )
 
@@ -960,6 +975,7 @@
 )
 
 (defrule Salir
+	(declare (salience -1))
 	(Modulo (Numero Salir))
 	(not (GuardarValores))
 	=>
