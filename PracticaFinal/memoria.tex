@@ -89,12 +89,12 @@ Para el módulo de valores inestables se tendrá en cuenta si ha habido noticias
 
 Es importante tener en cuenta que para el módulo de detectar valores peligrosos es necesario que ya se haya hecho la actualización de valores inestables.\\
 
-Si un valor no es inestable, si considera peligroso si el valor está cayendo durante cinco días y la diferencia entre la variación media del sector y la variación del valor sea mayor del 5\%. Por otro lado, si el valor es inestable y está cayendo durante 3 días, el valor se considera peligroso.
+Si un valor no es inestable, se considera peligroso si el valor está cayendo durante cinco días y la diferencia entre la variación media del sector y la variación del valor sea menor del -5\%. Por otro lado, si el valor es inestable y está cayendo durante 3 días, el valor se considera peligroso.
 
 \subsection{Sesión 4: Entrevista formal sobre los módulos de detección de valores infravalorados y sobrevalorados}
 El objetivo de esta sesión ha sido sacar en claro cuándo un valor está infravalorado o sobrevalorado y lo obtenido ha sido lo siguiente:\\
 
-En cuanto al módulo de detección de valores infravalorados, se considerará que un valor lo es si su PER es bajo y el RPD es alto, si la empresa ha caído más de un 30\% en los últimos 3, 6 o 12 meses y ha subido más de un 10\% en el último mes y el PER es bajo o si la empresa es grande, tiene el RPD alto, el PER mediano, no ha bajado en cinco días y la variación con respecto a su sector es mayor que 5.\\
+En cuanto al módulo de detección de valores infravalorados, se considerará que un valor lo es si su PER es bajo y el RPD es alto, si la empresa ha caído más de un 30\% en los últimos 3, 6 o 12 meses y ha subido entre un 5\% y un 10\% en el último mes y el PER es bajo o si la empresa es grande, tiene el RPD alto, el PER mediano, no ha bajado en cinco días y la variación con respecto a su sector es mayor que 5.\\
 
 En cuanto al módulo de detección de valore sobrevalorados, un valor lo estará si su PER es alto y el RPD bajo, si la empresa es pequeña y tiene el PER alto o si la empresa es pequeña y tiene el PER mediano pero el RPD bajo. Además, si la empresa es grande, tiene el RPD bajo, el PER mediano o alto, o si la empresa es grande, tiene el RPD medio y el PER alto, también se considerarán valores sobrevalorados.\\
 
@@ -116,6 +116,8 @@ Lo obtenido ha sido que hay cuatro posibles casos en los que conviene comprar o 
 
 \subsection{Variables de entrada del problema}
 Las variables de entrada necesarias serán un fichero llamado \textit{Analisis.txt}, que contendrá los valores de todas las variables necesarias (explicadas a continuación) para cada valor de la bolsa, un fichero llamado \textit{AnalisisSectores.txt} con el valor de las variables para los sectores (también explicadas a continuación), un fichero llamado \textit{Cartera.txt} que contendrá las acciones que tiene el usuario en su cartera, junto con el saldo disponible y por último un fichero llamado \textit{Noticias.txt} que contendrá las noticias que se han dado en los dos últimos días. Además, se le solicitará al usuario si quiere añadir más noticias.\\
+
+En todos los casos el formato de los ficheros será el valor de las variables que se detallan a continuación para cada fichero donde los valores de cada valor con el siguiente se separan por un salto de línea.\\
 
 Las variables en \textit{Analisis.txt} son las siguientes:
 \begin{enumerate}
@@ -171,58 +173,88 @@ Las variables en \textit{Cartera.txt} son las siguientes:
 Las variables en \textit{Noticia.txt} son las siguientes:
 \begin{enumerate}
 \item \textit{Nombre}: Nombre de la empresa a la que hace referencia la noticia.
-\item \textit{Tipo}: toma los valores buena o mala según sea la noticia.
+\item \textit{Tipo}: toma los valores Buena o Mala según sea la noticia.
+\item \textit{Dias}: días desde que la noticia se emitió (1 ó 2).
 \end{enumerate}
 
 \subsection{Variables de salida del programa}
+La salida del programa será reescribir el fichero \textit{Cartera.txt} actualizando con los cambios que el usuario haya decidido hacer (o con lo que ya había si no ha querido realizar ninguna acción).
 
 \subsection{Conocimiento global del sistema}
-(hechos y relaciones que se cargan inicialmente)
+Los hechos y relaciones que se cargan inicialmente son los siguientes:
+\begin{enumerate}
+\item Un hecho por cada valor del Ibex 35, conteniendo las variables presentes en el fichero \textit{Analisis.txt} comentadas en el apartado 1 de esta sección.
+\item Un hecho por cada distinto sector a los que pertenecen los valores del Ibex 35, conteniendo las variables presentes en el fichero \textit{AnalisisSectores.txt} comentadas en el apartado 1 de esta sección.
+\item Un hecho por cada noticia presente en el fichero \textit{Noticias.txt} conteniendo el valor al que hace referencia, si es buena o mala y la cantidad de días (1 o 2) que hace que se emitió dicha noticia.
+\item Un hecho por cada valor que el usuario tenga en la cartera que se haya leído del fichero \textit{Cartera.txt} conteniendo el nombre del valor, la cantidad de acciones que se poseen junto con su valor actual y la cantidad de dinero disponible en la cartera.
+\item Un hecho con el precio del dinero actual, que se puede cambiar al inicio del fichero \textit{practica.clp} si alguna vez cambia, ya que está definido en un \texttt{deffacts}.
+\item Un hecho por cada valor deducido como inestable.
+\item Un hecho por cada valor deducido como peligroso junto con la explicación de por qué se considera peligroso.
+\item Un hecho por cada valor deducido como infravalorado junto con la explicación de por qué se considera infravalorado.
+\item Un hecho por cada valor deducido como sobrevalorado, junto con la explicación de por qué se considera sobrevalorado.
+\item Un hecho por cada propuesta que se puede hacer al usuario conteniendo el tipo de la propuesta (si es para comprar, vender o cambiar unas acciones por otras) el valor o los valores involucrados, el rendimiento que se sacaría de dicha acción y una explicación sobre por qué se da esa propuesta.
+\end{enumerate}
+
+Una vez se han cargado todos estos hechos se le presentan al usuario las cinco mejores propuestas que se pueden hacer (aquellas cinco que tengan un mejor rendimiento) y se le pregunta si desea hacer cualquiera de estas acciones o por el contrario otra cosa distinta o si desea salir. En caso de que quiera llevar a cabo una acción se le pregunta cuál y qué empresa quiere vender y/o comprar y cuántas acciones de cada una. A continuación se llevan a cabo dichas acciones en caso de que se disponga de dinero suficiente para comprar las acciones pedidas en caso de que sea comprar y se disponga de acciones suficientes para vender si es vender. En caso de que no haya dinero o acciones suficientes se muestra un mensaje por pantalla indicándolo y no se realiza dicha acción. Después se le pregunta si quiere hacer más acciones o quiere salir del programa. En caso de querer realizar más acciones se eliminan las propuestas y se recalculan unas nuevas en función de los nuevos valores que se tienen en cartera y se vuelven a presentar las cinco mejores. Si quiere salir lo que se hace es guardar la cartera tal como esté en ese momento y salir del programa.
 
 \subsection{Especificación de los módulos que se han desarrollado}
 (incluyendo para cada módulo el objetivo, conocimiento que utiliza y conocimiento que se deduce).
 
+\subsubsection{Módulo inicial: leer datos de los ficheros}
+\textsc{Objetivo}: Recoger los datos iniciales necesarios para el correcto funcionamiento del SE. Se leen desde fichero en este módulo los valores junto con sus variables, los sectores junto con sus variables, la cartera del usuario y las noticias, según se ha indicado en apartados anteriores.\\
+
+\textsc{Conocimiento que utiliza}: Este módulo no necesita conocimiento previo para ejecutarse, sólo necesita que los ficheros \textit{Analisis.txt}, \textit{AnalisisSectores.txt}, \textit{Noticias.txt} y \textit{Cartera.txt} estén en la misma carpeta en la que está el fichero \textit{practica.clp}.\\
+
+\textsc{Conocimiento que se deduce}: Este módulo no deduce conocimiento, simplemente inserta en la base de hechos un hecho por cada valor, un hecho por cada sector, un hecho por cada noticia y un hecho por cada valor del que se tengan acciones en la cartera, de la forma en la que se explica en la sección 3.3.
+
 \subsubsection{Módulo Cero}
-\textbf{Objetivo}: \\
+\textsc{Objetivo}: Este módulo tiene como objetivo deducir los valores inestables. Por defecto, todo aquel valor que no aparezca en un hecho del tipo (Inestable NombreValor) será estable.\\
 
-\textbf{Conocimiento que utiliza}: \\
+\textsc{Conocimiento que utiliza}: Este módulo necesita que el módulo inicial descrito en el apartado anterior ya haya terminado de ejecutarse, ya que son necesarios todos los valores, todos los sectores y todas las noticias. Las noticias son lo más relevante aquí ya que serán las que pongan un valor a estable (es decir, que quiten que es inestable) o inestable según si hay noticias sobre ese valor o sobre su sector y según sean buenas o malas. En caso de que haya más de una noticia sobre un valor y sean contradictorias prevalecerá la buena, mientras que si hay una noticia sobre un valor concreto y otra sobre un sector y son contradictorias prevalecerá la noticia sobre el valor concreto. Si un sector es inestable todos los valores de ese sector serán inestables por defecto. \\
 
-\textbf{Conocimiento que se deduce}:
+\textsc{Conocimiento que se deduce}: El conocimiento que se deduce son aquellos valores que son inestables. Todo valor que no se deduzca que es inestable (o que deje de serlo en algún momento) será estable.
 
 \subsubsection{Módulo Uno}
-\textbf{Objetivo}: \\
+\textsc{Objetivo}: El objetivo de este módulo es detectar los valores peligrosos que el usuario tiene en la cartera. Un valor puede ser peligroso porque esté en bajada durante 5 días y caiga más de un 5\% de su sector o porque sea inestable y esté en bajada durante 3 días. \\
 
-\textbf{Conocimiento que utiliza}: \\
+\textsc{Conocimiento que utiliza}: Por tanto, dicho módulo necesita como conocimiento previo aquel que da el módulo cero (valores inestables) y por tanto el módulo cero deberá ejecutarse antes que este. Además necesita el conocimiento que ya hay en la base de hechos sobre los valores y los sectores.\\
 
-\textbf{Conocimiento que se deduce}:
+\textsc{Conocimiento que se deduce}: El conocimiento deducido aquí son aquellos valores pertenecientes a la cartera del usuario que son peligrosos. Para aquellos que lo sean se insertará en la base de hechos un hecho del tipo (Peligroso NombreValor Explicacion).
 
 \subsubsection{Módulo Dos}
-\textbf{Objetivo}: \\
+\textsc{Objetivo}: El objetivo de este módulo es detectar los valores sobrevalorados.\\
 
-\textbf{Conocimiento que utiliza}: \\
+\textsc{Conocimiento que utiliza}: El conocimiento que utiliza este módulo es el de los valores y los sectores, por lo que no es necesario que se ejecute después de los módulos anteriores, aunque se ha elegido hacerlo así para que quede más claro el procedimiento.\\
 
-\textbf{Conocimiento que se deduce}:
+\textsc{Conocimiento que se deduce}: Se deducen aquellos valores que están sobrevalorados, es decir, que se prevee que van a dar menos rendimiento del que parece a priori.
 
 \subsubsection{Módulo Tres}
-\textbf{Objetivo}: \\
+\textsc{Objetivo}: El objetivo de este módulo es detectar los valores infravalorados.\\
 
-\textbf{Conocimiento que utiliza}: \\
+\textsc{Conocimiento que utiliza}: El conocimiento que utiliza este módulo es el de los valores y los sectores, por lo que no es necesario que se ejecute después de los módulos anteriores, aunque se ha elegido hacerlo así para que quede más claro el procedimiento.\\
 
-\textbf{Conocimiento que se deduce}:
+\textsc{Conocimiento que se deduce}: El conocimiento que se deduce son aquellos valores que están infravalorados, es decir, aquellos que se prevee que van a dar más rendimiento del que puede parecer.
 
 \subsubsection{Módulo Cuatro}
-\textbf{Objetivo}: \\
+\textsc{Objetivo}: El objetivo de este módulo es encontrar todas las posibles propuestas que se le puedan dar al usuario porque vayan a tener un mejor rendimiento de lo que actualmente se tiene en cartera (bien sea cambiando valores como vendiendo o comprando valores de los que no se tengan previamente acciones o de los que sí).\\
 
-\textbf{Conocimiento que utiliza}: \\
+\textsc{Conocimiento que utiliza}: El conocimiento que necesita este módulo son los valores sobrevalorados e infravalorados, por lo que los módulos dos y tres deben ejecutarse antes que este.\\
 
-\textbf{Conocimiento que se deduce}:
+\textsc{Conocimiento que se deduce}: Se deducen las propuestas que se le pueden hacer al usuario y se insertan en la base de hechos con hechos del tipo (Propuesta Tipo Valor Rendimiento Explicacion).
 
 \subsubsection{Módulo Cinco}
-\textbf{Objetivo}: \\
+\textsc{Objetivo}: El objetivo de este módulo es encontrar las cinco mejores propuestas y mostrarlas al usuario por pantalla para posteriormente pedirle una acción entre \textit{Comprar}, \textit{Vender}, \textit{Cambiar} y \textit{Salir}. Además, si la acción está entre las tres primeras, las lleva a cabo preguntado valor a comprar/vender y cantidad de acciones a comprar/vender.\\
 
-\textbf{Conocimiento que utiliza}: \\
+\textsc{Conocimiento que utiliza}: \\
 
-\textbf{Conocimiento que se deduce}:
+\textsc{Conocimiento que se deduce}:
+
+\subsubsection{Módulo Seis: Salir del programa}
+\textsc{Objetivo}: \\
+
+\textsc{Conocimiento que utiliza}: \\
+
+\textsc{Conocimiento que se deduce}:
 
 \subsection{Estructura de funcionamiento del esquema de razonamiento del sistema}
 (cuándo actuará cada módulo)
