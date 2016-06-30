@@ -51,12 +51,6 @@
   (field Dias)
 )
 
-(deftemplate NuevaCartera
-	(field Nombre)
-	(field Acciones)
-	(field ValorActual)
-)
-
 (deftemplate Inestable
 	(field Nombre)
 )
@@ -242,6 +236,7 @@
 		(Numero Cero)))
 )
 
+; El sector construcción es inestable por defecto
 (defrule InestablePorSectorConst
 	(Modulo
 		(Numero Cero))
@@ -253,6 +248,7 @@
 		(Nombre ?NV)))
 )
 
+; El sector servicios es inestable si lo es el Ibex
 (defrule InestableServiciosPorEconomia
 	(Modulo
 		(Numero Cero))
@@ -264,6 +260,7 @@
 		(Nombre Servicios)))
 )
 
+; Un valor de un sector inestable será inestable por defecto
 (defrule InestablePorSector
 	(Modulo
 		(Numero Cero))
@@ -277,6 +274,7 @@
 		(Nombre ?NV)))
 )
 
+; Si hay una noticia buena deja de ser inestable
 (defrule EstablePorNoticiaSector
 	(Modulo
 		(Numero Cero))
@@ -295,6 +293,7 @@
 	(retract ?Borrar)
 )
 
+; Si hay una noticia buena sobre el sector éste deja de ser inestable.
 (defrule EstableSectorPorNoticiaSector
 	(Modulo
 		(Numero Cero))
@@ -307,6 +306,7 @@
 	(retract ?Borrar)
 )
 
+; Si hay una noticia buena sobre un valor éste deja de ser inestable.
 (defrule EstablePorNoticiaValor
 	(Modulo
 		(Numero Cero))
@@ -319,6 +319,7 @@
 	(retract ?Borrar)
 )
 
+; Si hay una noticia mala sobre un valor se convierte en inestable.
 (defrule InestablePorNoticia
 	(Modulo
 		(Numero Cero))
@@ -330,6 +331,7 @@
 		(Nombre ?NV)))
 )
 
+; Si hay una noticia mala sobre el ibex, todos los valores serán inestables por defecto.
 (defrule InestablePorEconomia
 	(Modulo
 		(Numero Cero))
@@ -354,6 +356,8 @@
 ; Aquí termina el módulo para detectar valores estables e inestables
 
 ; Aquí comienza el módulo para detectar valores peligrosos
+
+; Si un valor es inestable y ha bajado durante tres días, es peligroso.
 (defrule PeligrosoInestable
 	(Modulo
 		(Numero Uno))
@@ -370,6 +374,8 @@
 		(Explicacion "peligrosa porque es inestable y ha estado perdiendo durante los ultimos tres dias")))
 )
 
+; Si un valor ha bajado durante cinco días y en esos cinco días se ha comportado peor que su sector en un
+; 5%, es peligroso.
 (defrule PeligrosoBajada5
 	(Modulo
 		(Numero Uno))
@@ -411,6 +417,7 @@
 		(Explicacion "sobrevalorada porque el PER es alto y el RPD bajo")))
 )
 
+; Sobrevalorado en empresa pequeña
 (defrule SobrevaloradoEmpPeq
 	(Modulo
 		(Numero Dos))
@@ -426,6 +433,7 @@
 		(Explicacion "sobrevalorada porque la empresa es pequeña y el PER alto")))
 )
 
+; Sobrevalorado en empresa pequeña
 (defrule SobrevaloradoEmpPeq2
 	(Modulo
 		(Numero Dos))
@@ -442,6 +450,7 @@
 		(Explicacion "sobrevalorada porque es pequeña, tiene el PER medio y el RPD bajo")))
 )
 
+; Sobrevalorado en empresa grande
 (defrule SobrevaloradoEmpGra
 	(Modulo
 		(Numero Dos))
@@ -458,6 +467,7 @@
 		(Explicacion "sobrevalorada porque la empresa es grande, el PER medio o alto y el RPD bajo")))
 )
 
+; Sobrevalorado en empresa grande
 (defrule SobrevaloradoEmpGra2
 	(Modulo
 		(Numero Dos))
@@ -498,7 +508,6 @@
 		(Explicacion "infravalorada porque el PER es bajo y el RPD alto")))
 )
 
-;Considero subir pero no mucho subir entre un 5% y un 10%
 (defrule InfravaloradoCaida
 	(Modulo
 		(Numero Tres))
@@ -518,8 +527,7 @@
 		(Explicacion "infravalorada porque ha caido en los ultimos 3,6 o 12 meses, ha subido mas de un 10 en el ultimo mes y PER bajo")))
 )
 
-;Considero no estar bajando que no haya bajado en 5 días
-;Considero que comportarse mejor que su sector es que la variacion de 5 dias con respecto al sector sea menor que 5
+
 (defrule InfravaloradoGra
 	(Modulo
 		(Numero Tres))
@@ -546,8 +554,7 @@
 ; Aquí termina el módulo para detectar valores infravalorados
 
 ; Aquí empieza el módulo de realización de propuestas
-
-; Proponer vender acciones de empresas peligrosas
+; Proponer vender acciones de empresas peligrosas si se poseen acciones de dicha empresa
 (defrule PropuestaPeligrosa
 	(Modulo
 		(Numero Cuatro))
@@ -577,7 +584,7 @@
 		 ?RPD " por dividendos perderíamos un " ?Rend))))
 )
 
-; Proponer invertir en empresas infravaloradas
+; Proponer invertir en empresas infravaloradas si se dispone de dinero
 (defrule PropuestaInfravalorada
 	(Modulo
 		(Numero Cuatro))
@@ -607,7 +614,6 @@
 )
 
 ; Proponer vender valores de empresas sobrevaloradas
-; Tomo como rendimineto por año la suma de RPD y la variación del precio en 1 año
 (defrule PropuestaVenderSobrevalorada
 	(Modulo
 		(Numero Cuatro))
@@ -639,8 +645,6 @@
 )
 
 ; Proponer cambiar una inversión a valores más rentables
-; Tomo por revalorización por año esperado la variación del precio en el año anterior
-; Controlo también además que no tenga ya valores de la empresa que voy a cambiar
 (defrule PropuestaCambio
 	(Modulo
 		(Numero Cuatro))
@@ -685,6 +689,8 @@
 ; Aquí empieza el módulo de elección de propuestas. En este módulo se van a elegir las
 ; cinco mejores propuestas (aquellas que tengan mejor rendimiento) y se preguntará al
 ; usuario si quiere comprar/vender y cuántas acciones
+
+; Buscar la propuesta con mayor rendimiento
 (defrule FindMax
 	(Modulo
 		(Numero Cinco))
@@ -698,6 +704,7 @@
   (assert (Max ?NV1 ?R1))
 )
 
+; Mostrar la propuesta con mayor rendimiento y eliminarla de la base de hechos.
 (defrule MostrarMax
 	(Modulo
 		(Numero Cinco))
@@ -716,18 +723,20 @@
 	(assert (ContadorMostradas ?CM2))
 )
 
+; Pedir la acción al usuario que desea realizar.
 (defrule PedirAccion
 	(declare (salience -1))
 	(Modulo
 		(Numero Cinco))
 	=>
 	(printout t "¿Desea realizar alguna de estas acciones u otra accion distinta? Introduzca Vender para una accion
-	de tipo vender, Comprar para una accion de tipo comprar, Cambio para una cambio de tipo
+	de tipo vender, Comprar para una accion de tipo comprar, Cambio para una accion de tipo
 	Cambio y Salir para no realizar ningun movimiento y salir." crlf)
 	(bind ?Respuesta (read))
 	(assert (RespuestaUsuario ?Respuesta))
 )
 
+; Si el usuario quiere vender, preguntar qué y cuánto quiere vender y si va a querer realizar más acciones.
 (defrule PedirAccionVender
 	(Modulo
 		(Numero Cinco))
@@ -745,6 +754,7 @@
 	(if (eq ?Respuesta Salir) then (assert (RespuestaUsuario Salir)))
 )
 
+; Si el usuario quiere comprar, preguntar qué y cuánto quiere comprar y si va a querer realizar más acciones.
 (defrule PedirAccionComprar
 	(Modulo
 		(Numero Cinco))
@@ -762,6 +772,8 @@
 	(if (eq ?Respuesta Salir) then (assert (RespuestaUsuario Salir)))
 )
 
+; Si el usuario quiere cambiar un valor por otro, preguntar qué y cuánto quiere vender y qué y cuanto
+; quiere comprar y si va a querer realizar más acciones.
 (defrule PedirAccionCambio
 	(Modulo
 		(Numero Cinco))
@@ -784,6 +796,7 @@
 	(if (eq ?Respuesta Salir) then (assert (RespuestaUsuario Salir)))
 )
 
+; Si ha solicitado vender y la venta puede llevarse a cabo, realizarla
 (defrule CambiarCarteraVender
 	(declare (salience -1))
 	(Modulo
@@ -817,6 +830,7 @@
 			(ValorActual ?NuevaCantidadEnValor))))
 )
 
+; Si ha solicitado vender y no puede llevarse a cabo, informar al usuario.
 (defrule ErrorVender
 	(declare (salience -1))
 	(Modulo
@@ -831,6 +845,8 @@
 	(printout t "No se disponen de tantas acciones como desea vender" clrf)
 )
 
+; Si ha solicitado comprar, no se tienen acciones previas de dicho valor y se puede llevar
+; a cabo la compra, realizarla.
 (defrule CambiarCarteraComprar
 	(declare (salience -2))
 	(Modulo
@@ -860,6 +876,8 @@
 		(ValorActual ?NuevaCantidad)))
 )
 
+; Si ha solicitado comprar, se tienen acciones previas de dicho valor y se puede llevar
+; a cabo la compra, realizarla.
 (defrule CambiarCarteraComprarExistente
 	(declare (salience -2))
 	(Modulo
@@ -892,6 +910,7 @@
 		(ValorActual ?NuevaCantidad)))
 )
 
+; Si se ha solicitado comprar y no se puede realizar dicha acción, informar al usuario.
 (defrule ErrorComprar
 	(declare (salience -2))
 	(Modulo
@@ -909,6 +928,7 @@
 	(printout t "No se dispone de dinero suficiente para comprar tantas acciones" crlf)
 )
 
+; Eliminar todas las propuestas para generar nuevas en base a la nueva cartera.
 (defrule EliminarPropuestas
 	(declare (salience -3))
 	(Modulo
@@ -921,6 +941,8 @@
 	(assert (Volver Modulo1))
 )
 
+; En caso de que se quieran seguir haciendo acciones, volver al módulo 1 para recalcular
+; datos sobre valores y propuestas.
 (defrule SalirModulo5
 	(declare (salience -4))
 	?f <- (Modulo (Numero Cinco))
@@ -933,6 +955,7 @@
 	(assert (Modulo (Numero Uno)))
 )
 
+; Si se ha solicitado salir, ir al último módulo
 (defrule SalirPrograma
 	(declare (salience -4))
 	?f <- (Modulo (Numero Cinco))

@@ -48,6 +48,9 @@ Quinto curso del Doble Grado en Ingeniería Informática y Matemáticas.\\
 \newpage
 
 \section{Resumen sobre cómo funciona el sistema experto}
+El sistema experto se compone de siete módulos funcionales: módulo inicial, encargado de leer los datos iniciales de la cartera, módulo cero, encargado de detectar valores inestables, módulo uno, encargado de detectar valores peligrosos, módulo dos, encargado de detectar valores sobrevalorados, módulo tres, encargado de detectar valores infravalorados, módulo cuatro, encargado de hacer las propuestas, módulo cinco, encargado de la interacción con el usuario sobre las propuestas y módulo seis, encargado de guardar la cartera y salir del programa.\\
+
+En el módulo de interacción con el usuario sobre las propuestas se podrá elegir entre salir del programa o eliminar las propuestas existentes y volver al módulo uno para generar unas nuevas según la nueva cartera del usuario, ya que ésta habrá cambiado al llevarse a cabo la acción que pida el usuario, en caso de ser posible llevarla a cabo.
 
 \section{Descripción del proceso seguido para el desarrollo}
 
@@ -56,7 +59,7 @@ Paso a detallar lo que he sacado en claro de cada entrevista con el experto y el
 \subsection{Sesión 1: Entrevista informal general}
 En esta entrevista han estado presentes directivo, experto y usuarios. Ha sido la primera entrevista, ha sido informal y ha sido principalmente para tener una idea general sobre qué se desea que haga el sistema experto.\\
 
-El \textbf{directivo} nos pide un sistema que ayude a los novatos sobre cómo actuar. Estos agentes tienen una cartera de dinero y tienen que decidir cómo mover las acciones para obtener rentabilidad. Los agentes utilizan muchos datos, tales como el tipo de fondo que se maneja, situación económica actual y situación económica de la cartera de acciones. Quiere que el novato, con darle a un botón, obtenga una proposición de venta o compra de acciones y el por qué de ese razonamiento. Se opera con los datos del Ibex 35 y el proceso suele ser analizar la situación, analizar valores de caída, valores prometedores y situación política, y en base a eso decidir si se invierte o no. Hay también unos valores más estables que otros. Nos pide también que como mucho aparezcan 5 valores en los que invertir o vender (de más importante a menos importante) y que informe también del riesgo de la acción y el beneficio esperado. Nos dice que un valor no puede ocupar más del 50\% de la cartera. Además los valores que tengamos invertidos y que preveamos que van a caer hay que venderlos. Una de las entradas será la cartera actual, que se leerá de un fichero al iniciar el programa. Una vez que se toma una decisión el sistema deberá actualizar la cartera.\\
+El \textbf{directivo} nos pide un sistema que ayude a los novatos sobre cómo actuar. Estos agentes tienen una cartera de dinero y tienen que decidir cómo mover las acciones para obtener rentabilidad. Los agentes utilizan muchos datos, tales como el tipo de fondo que se maneja, situación económica actual y situación económica de la cartera de acciones. Quiere que el novato, con darle a un botón, obtenga una proposición de venta o compra de acciones y el por qué de ese razonamiento. Se opera con los datos del Ibex 35 y el proceso suele ser analizar la situación, analizar valores de caída, valores prometedores y situación política, y en base a eso decidir si se invierte o no. Hay también unos valores más estables que otros. Nos pide también que como mucho aparezcan 5 valores en los que invertir o vender (de más importante a menos importante) y que informe también del riesgo de la acción y el beneficio esperado. Además los valores que tengamos invertidos y que preveamos que van a caer hay que venderlos. Una de las entradas será la cartera actual, que se leerá de un fichero al iniciar el programa. Una vez que se toma una decisión el sistema deberá actualizar la cartera.\\
 
 El \textbf{experto} nos dice que los principales datos de los que se dispone es de la evolución de los valores a 6 meses y a un año, y que los mismos se cogen de la bolsa de Madrid. Además se suele hacer un filtro de los valores prometedores, los que van a tener una caída o los que van a tener una subida. Una vez hecho esto se distinguen los valores que están en caída real o no y los que están en subida real o no.\\
 
@@ -109,10 +112,14 @@ Lo obtenido ha sido que hay cuatro posibles casos en los que conviene comprar o 
 \item Si una empresa no está sobrevalorada y su RPD es mayor que la revalorazación por año esperado más su RPD más 1 de una empresa de mi cartera que no está infravalorada y no poseo ya acciones de la primera empresa, proponer cambiar las acciones de las empresas.
 \end{enumerate}
 
+Además, a la hora de comprar y vender valores de una empresa es necesario tener en cuenta que hay que pagar un 0.05\% de lo que se compra y/o vende.
+
 \subsection{Procedimiento de validación y verificación del sistema seguido}
+Con respecto a la verificación, a lo largo del desarrollo del sistema experto ha habido varios fallos que se han corregido después, como entrar en un bucle infinito con las noticias, que un valor aparezca como sobrevalorado dos veces o que una regla no llegase a ejecutarse nunca. Estos fallo ya están corregidos en la versión final y ahora el SE funciona correctamente. No presenta inconsistencias estructurales, lógicas ni semánticas que se hayan detectado.\\
+
+En cuanto a la validación, creo que la interfaz es comprensible para el usuario, la explicación del razonamiento es suficiente y cumple los requisitos de ejecución en tiempo real. Además, la comunicación entre módulos es la apropiada. Se han hecho varios casos de prueba con el experto y los resultados han sido los esperados, con lo que se considera que el sistema está validado.
 
 \section{Descripción del sistema desarrollado}
-(El lector debe ser capaz de entender la estructura y modificar o completar la base de conocimiento si lo desea)
 
 \subsection{Variables de entrada del problema}
 Las variables de entrada necesarias serán un fichero llamado \textit{Analisis.txt}, que contendrá los valores de todas las variables necesarias (explicadas a continuación) para cada valor de la bolsa, un fichero llamado \textit{AnalisisSectores.txt} con el valor de las variables para los sectores (también explicadas a continuación), un fichero llamado \textit{Cartera.txt} que contendrá las acciones que tiene el usuario en su cartera, junto con el saldo disponible y por último un fichero llamado \textit{Noticias.txt} que contendrá las noticias que se han dado en los dos últimos días. Además, se le solicitará al usuario si quiere añadir más noticias.\\
@@ -198,8 +205,6 @@ Los hechos y relaciones que se cargan inicialmente son los siguientes:
 Una vez se han cargado todos estos hechos se le presentan al usuario las cinco mejores propuestas que se pueden hacer (aquellas cinco que tengan un mejor rendimiento) y se le pregunta si desea hacer cualquiera de estas acciones o por el contrario otra cosa distinta o si desea salir. En caso de que quiera llevar a cabo una acción se le pregunta cuál y qué empresa quiere vender y/o comprar y cuántas acciones de cada una. A continuación se llevan a cabo dichas acciones en caso de que se disponga de dinero suficiente para comprar las acciones pedidas en caso de que sea comprar y se disponga de acciones suficientes para vender si es vender. En caso de que no haya dinero o acciones suficientes se muestra un mensaje por pantalla indicándolo y no se realiza dicha acción. Después se le pregunta si quiere hacer más acciones o quiere salir del programa. En caso de querer realizar más acciones se eliminan las propuestas y se recalculan unas nuevas en función de los nuevos valores que se tienen en cartera y se vuelven a presentar las cinco mejores. Si quiere salir lo que se hace es guardar la cartera tal como esté en ese momento y salir del programa.
 
 \subsection{Especificación de los módulos que se han desarrollado}
-(incluyendo para cada módulo el objetivo, conocimiento que utiliza y conocimiento que se deduce).
-
 \subsubsection{Módulo inicial: leer datos de los ficheros}
 \textsc{Objetivo}: Recoger los datos iniciales necesarios para el correcto funcionamiento del SE. Se leen desde fichero en este módulo los valores junto con sus variables, los sectores junto con sus variables, la cartera del usuario y las noticias, según se ha indicado en apartados anteriores.\\
 
@@ -208,7 +213,7 @@ Una vez se han cargado todos estos hechos se le presentan al usuario las cinco m
 \textsc{Conocimiento que se deduce}: Este módulo no deduce conocimiento, simplemente inserta en la base de hechos un hecho por cada valor, un hecho por cada sector, un hecho por cada noticia y un hecho por cada valor del que se tengan acciones en la cartera, de la forma en la que se explica en la sección 3.3.
 
 \subsubsection{Módulo Cero}
-\textsc{Objetivo}: Este módulo tiene como objetivo deducir los valores inestables. Por defecto, todo aquel valor que no aparezca en un hecho del tipo (Inestable NombreValor) será estable.\\
+\textsc{Objetivo}: Este módulo tiene como objetivo deducir los valores inestables. Por defecto, todo aquel valor que no aparezca en un hecho del tipo (Inestable (Nombre \textit{NombreValor})) será estable.\\
 
 \textsc{Conocimiento que utiliza}: Este módulo necesita que el módulo inicial descrito en el apartado anterior ya haya terminado de ejecutarse, ya que son necesarios todos los valores, todos los sectores y todas las noticias. Las noticias son lo más relevante aquí ya que serán las que pongan un valor a estable (es decir, que quiten que es inestable) o inestable según si hay noticias sobre ese valor o sobre su sector y según sean buenas o malas. En caso de que haya más de una noticia sobre un valor y sean contradictorias prevalecerá la buena, mientras que si hay una noticia sobre un valor concreto y otra sobre un sector y son contradictorias prevalecerá la noticia sobre el valor concreto. Si un sector es inestable todos los valores de ese sector serán inestables por defecto. \\
 
@@ -219,7 +224,7 @@ Una vez se han cargado todos estos hechos se le presentan al usuario las cinco m
 
 \textsc{Conocimiento que utiliza}: Por tanto, dicho módulo necesita como conocimiento previo aquel que da el módulo cero (valores inestables) y por tanto el módulo cero deberá ejecutarse antes que este. Además necesita el conocimiento que ya hay en la base de hechos sobre los valores y los sectores.\\
 
-\textsc{Conocimiento que se deduce}: El conocimiento deducido aquí son aquellos valores pertenecientes a la cartera del usuario que son peligrosos. Para aquellos que lo sean se insertará en la base de hechos un hecho del tipo (Peligroso NombreValor Explicacion).
+\textsc{Conocimiento que se deduce}: El conocimiento deducido aquí son aquellos valores pertenecientes a la cartera del usuario que son peligrosos. Para aquellos que lo sean se insertará en la base de hechos un hecho del tipo (Peligroso (Nombre \textit{NombreValor} Explicacion \textit{explicación})).
 
 \subsubsection{Módulo Dos}
 \textsc{Objetivo}: El objetivo de este módulo es detectar los valores sobrevalorados.\\
@@ -240,29 +245,130 @@ Una vez se han cargado todos estos hechos se le presentan al usuario las cinco m
 
 \textsc{Conocimiento que utiliza}: El conocimiento que necesita este módulo son los valores sobrevalorados e infravalorados, por lo que los módulos dos y tres deben ejecutarse antes que este.\\
 
-\textsc{Conocimiento que se deduce}: Se deducen las propuestas que se le pueden hacer al usuario y se insertan en la base de hechos con hechos del tipo (Propuesta Tipo Valor Rendimiento Explicacion).
+\textsc{Conocimiento que se deduce}: Se deducen las propuestas que se le pueden hacer al usuario y se insertan en la base de hechos con hechos del tipo (Propuesta (Tipo Valor Rendimiento Explicacion)).
 
 \subsubsection{Módulo Cinco}
-\textsc{Objetivo}: El objetivo de este módulo es encontrar las cinco mejores propuestas y mostrarlas al usuario por pantalla para posteriormente pedirle una acción entre \textit{Comprar}, \textit{Vender}, \textit{Cambiar} y \textit{Salir}. Además, si la acción está entre las tres primeras, las lleva a cabo preguntado valor a comprar/vender y cantidad de acciones a comprar/vender.\\
+\textsc{Objetivo}: El objetivo de este módulo es encontrar las cinco mejores propuestas y mostrarlas al usuario por pantalla para posteriormente pedirle una acción entre \textit{Comprar}, \textit{Vender}, \textit{Cambiar} y \textit{Salir}. Además, si la acción está entre las tres primeras, las lleva a cabo preguntado valor a comprar/vender y cantidad de acciones a comprar/vender. Es el que maneja la interacción con el usuario. También tiene la función de que, si no se desea salir del programa, volver al módulo uno para recalcular valores inestables, peligrosos, sobrevalorados e infravalorados (en caso de que cambiara alguno) y volver a calcular las propuestas en base a la cartera nueva.\\
 
-\textsc{Conocimiento que utiliza}: \\
+\textsc{Conocimiento que utiliza}: Este módulo utiliza el conocimiento resultante del módulo cuatro, es decir, las posibles propuestas que se le van a hacer al usuario, además del conocimiento sobre los valores y los sectores.\\
 
-\textsc{Conocimiento que se deduce}:
+\textsc{Conocimiento que se deduce}: Los nuevos valores que se compran o venden y la cantidad de acciones de los mismos, es decir, se llevan a cabo las acciones que indica el usuario y se cambian en la base de hechos.
 
 \subsubsection{Módulo Seis: Salir del programa}
-\textsc{Objetivo}: \\
+\textsc{Objetivo}: Guardar la cartera con las modificaciones que se hayan hecho y cerrar el programa.\\
 
-\textsc{Conocimiento que utiliza}: \\
+\textsc{Conocimiento que utiliza}: Los hechos del tipo (Cartera (Nombre \textit{NombreValor} Acciones \textit{NumAcciones} ValorActual \textit{ValorAcciones})) que son los referentes a la cartera para guardarlos en el archivo \textit{Cartera.txt} \\
 
-\textsc{Conocimiento que se deduce}:
+\textsc{Conocimiento que se deduce}: La cartera final con el efecto de las acciones que ha elegido el usuario sobreescribiendo el archivo \textit{Cartera.txt}.
 
 \subsection{Estructura de funcionamiento del esquema de razonamiento del sistema}
-(cuándo actuará cada módulo)
+Como se ha ido comentando durante el apartado anterior, hay módulos que tienen que ser secuenciales por dependencias unos con otros, como el módulo inicial de lectura, que tiene que ejecutarse antes que cualquier otro módulo, o el de detección de valores inestables, que tiene que ejecutarse antes que el de detección de valores peligrosos. En concreto, los únicos dos módulos que no han de ser secuenciales son los módulos tres y cuatro, que es suficiente con que se ejecuten después del módulo inicial y antes del módulo cinco. Sin embargo, la estructura seguida es secuencial para facilitar la lectura del programa y porque realmente no había diferencia en que esos dos módulos se ejecutaran de forma paralela en cuanto a tiempos de ejecución. Por tanto, el orden en el que actúan los módulos es módulo inicial - módulo cero - módulo uno - módulo dos - módulo tres - módulo cuatro - módulo cinco - módulo seis (salir).
 
 \subsection{Lista de hechos que utiliza el sistema durante su funcionamiento y la forma de representarlos}
+Para representar los hechos he utilizado \texttt{deftemplate} en la mayoría de los casos (en todos excepto para el precio del dinero y para hechos que iba a borrar seguidamente, como para pasar de leer un archivo a cerrarlo). Por tanto, hay un \texttt{deftemplate} para Valor, otro para Sector, otro para Cartera, otro para Noticia, otro para Inestable, otro para Peligroso, otro para Sobrevalorado, otro para Infravalorado, otro para Propuesta y otro para Modulo, ya que la gestión de los módulos la hago condicionando a que haya en la base de hechos un hecho del tipo (Modulo (Numero \textit{numeroDelModulo})). Cada \texttt{deftemplate} tiene tantos \texttt{fields} como variables hubiera que guardar de cada tipo en cuanto a Valor, Sector, Noticia y Cartera. Para Inestable sólo guardo el nombre del valor, para Peligroso, Sobrevalorado e Infravalorado el nombre y la explicación de por qué los valores son de ese tipo y para Propuesta el tipo de la propuesta, el nombre del valor al que hace referencia, el rendimiento que conllevaría comprar o vender dicho valor y la explicación de por qué es conveniente hacerlo.
 
 \subsection{Hechos y reglas de cada módulo}
+\subsubsection{Módulo inicial}
+Como se ha comentado previamente, el objetivo de este módulo es leer los datos de los ficheros. Por tanto, las reglas pertenecientes a este módulo son para abrir, leer y cerrar los cuatro ficheros. Hay una regla para abrir cada fichero, una para fichero para seguir leyendo y una para cada fichero para cerrar. En la regla para leer es en la que se van creando los hechos guardando para cada \texttt{field} su valor, que será el que aparezca en el fichero correspondiente. Por ejemplo, la regla para leer el fichero de sectores es la siguiente:
+
+\begin{lstlisting}
+(defrule LeerSectoresFromFile
+	(declare (salience 46))
+  ?f <- (SeguirLeyendoSectores)
+  =>
+  (bind ?NombreSector (read datosSectores))
+  (retract ?f)
+  (if (neq ?NombreSector EOF) then
+    (assert (Sector
+      (Nombre ?NombreSector)
+      (VariacionDia  (read datosSectores))
+      (Capitalizacion (read datosSectores))
+      (PER (read datosSectores))
+      (RPD (read datosSectores))
+      (PorcentajeIbex (read datosSectores))
+      (Variacion5Dias (read datosSectores))
+      (Bajada3Dias (read datosSectores))
+      (Bajada5Dias (read datosSectores))
+      (Variacion1Mes (read datosSectores))
+      (Variacion3Meses (read datosSectores))
+      (Variacion6Meses (read datosSectores))
+      (Variacion1Ano (read datosSectores))))
+    (assert (SeguirLeyendoSectores)))
+)
+\end{lstlisting}
+
+Como vemos, se rellena cada hecho con todos sus campos y se pasa al siguiente hecho (al siguiente sector en este caso) hasta que se encuentra un final de fichero.
+
+\subsubsection{Módulo Cero}
+El objetivo de este módulo es detectar los valores inestables (cualquier valor que no tenga asociado un hecho del tipo (Inestable (Nombre \textit{nombreValor})) será estable por defecto). Consta de 8 reglas, además de las reglas para entrar y salir de dicho módulo.
+\begin{enumerate}
+\item \textit{InestablePorSectorConst}: es la regla para insertar el hecho de que el sector construcción es inestable.
+\item \textit{InestableServiciosPorEconomia}: es la regla para insertar el hecho de que el sector servicios es inestable si la economía lleva en bajada 5 días, es decir, si el sector Ibex lleva en bajada 5 días.
+\item \textit{InestablePorSector}: es la regla para insertar un hecho inestable por cada valor dentro de un sector marcado como inestable.
+\item \textit{EstablePorNoticiaSector}: es la regla para borrar que un hecho es inestable si hay una noticia buena sobre su sector y no hay una mala sobre el propio valor.
+\item \textit{EstableSectorPorNoticiaSector}: es la regla para borrar que un sector es inestable si hay una noticia buena sobre él.
+\item \textit{EstablePorNoticiaValor}: es la regla para borrar que un valor es inestable si hay una noticia buena sobre él.
+\item \textit{InestablePorNoticia}: es la regla para insertar un hecho inestable sobre un valor si hay una noticia mala sobre el mismo.
+\item \textit{InestablePorEconomia}: es la regla para insertar un hecho inestable sobre un valor si hay una noticia mala sobre la economía general, es decir, sobre el sector Ibex.
+\end{enumerate}
+
+\subsubsection{Módulo Uno}
+El objetivo de este módulo es detectar los valores peligrosos. Consta de dos reglas:
+\begin{enumerate}
+\item \textit{PeligrosoInestable}: regla para insertar un hecho del tipo (Peligroso (Nombre \textit{nombreValor} Explicacion \textit{explicacion})) si un valor de la cartera del usuario es inestable y ha estado bajando durante 3 días consecutivos.
+\item \textit{PeligrosoBajada5}: regla para insertar un hecho para un valor peligroso si pertenece a la cartera del usuario, ha estado bajando durante cinco días y la variación con respecto a su sector ha sido menor que -5.
+\end{enumerate}
+
+\subsubsection{Módulo Dos}
+El objetivo de este módulo es detectar valores sobrevalorados. Consta de cinco reglas:
+\begin{enumerate}
+\item \textit{SobrevaloradoGeneral}: inserta un hecho del tipo (Sobrevalorado (Nombre \textit{nombreValor} Explicacion \textit{explicacion})) si el PER de ese valor es alto y el RPD es bajo. Además se comprueba que no exista ya un hecho (Sobrevalorado ...) con el mismo nombre de valor y otra explicación, ya que una misma empresa puede activar distintas reglas porque no son excluyentes.
+\item \textit{SobrevaloradoEmpPeq}: inserta un hecho para un valor sobrevalorado si la empresa es pequeña, tiene el PER alto y no está sobrevalorada ya por otra causa.
+\item \textit{SobrevaloradoEmpPeq2}: inserta un hecho para un valor sobrevalorado si la empresa es pequeña, tiene el PER medio, el RPD bajo y no está ya sobrevalorada por otra causa.
+\item \textit{SobrevaloradoEmpGra}: inserta un hecho para un valor sobrevalorado si la empresa el grande, tiene el RPD bajo, el PER medio o alto y no está ya sobrevalorada por otra causa.
+\item \textit{SobrevaloradoEmpGra2}: inserta un hecho para un valor sobrevalorado si la empresa es grande, tiene el RPD medio, el PER alto y no está ya sobrevalorada por otra causa.
+\end{enumerate}
+
+\subsubsection{Módulo Tres}
+El objetivo de este módulo es detectar valores infravalorados. Consta de tres reglas:
+\begin{enumerate}
+\item \textit{InfravaloradoGeneral}: inserta un hecho del tipo (Infravalorado (Nombre \textit{nombreValor} Explicacion \textit{explicacion})) si dicho valor tiene el PER bajo y el RPD alto.
+\item \textit{InfravaloradoCaida}: inserta un hecho para un valor infravalorado si dicho valor tiene el PER bajo, ha caído más de un 30 por ciento en los últimos 3, 6 o 12 meses y ha subido entre un 5 y un 10\% en el último mes.
+\item \textit{InfravaloradoGra}: inserta un hecho para un valor infravalorado si la empresa es grande, tiene el RPD alto, el PER mediano, no ha bajado consecutivamente durante los últimos cinco días y la variación con respecto a su sector no es menor que -5\%.
+\end{enumerate}
+
+\subsubsection{Módulo Cuatro}
+El objetivo de este módulo es obtener todas las posibles propuestas que se le pueden hacer al usuario. Consta de cuatro reglas:
+\begin{enumerate}
+\item \textit{PropuestaPeligrosa}: es la regla que se encarga de insertar propuestas de tipo vender acciones de empresas peligrosas. Inserta dicha propuesta si el usuario tiene un valor en la cartera que sea peligroso cuya variación del precio en el mes anterior sea negativa y la diferencia de dicha variación con la variación de su sector sea menor que -3. El rendimiento de dicha propuesta es $20 - 100*RPD$.
+\item \textit{PropuestaInfravalorada}: es la regla que se encarga de proponer invertir en empresas infravaloradas. Inserta dicha propuesta si hay una empresa infravalorada y hay dinero disponible en la cartera del usuario. El rendimiento de dicha propuesta es $20*(PER\_sector - PER) / (100*RPD)$.
+\item \textit{PropuestaVenderSobrevalorada}: es la regla que se encarga de insertar una propuesta para vender una empresa sobrevalorada. Dicha regla se inserta si el usuario tiene un valor sobrevalorado tal que su variación en un año más $100*RPD$ sea menor que 5 más el precio del dinero. El rendimiento de esta propuesta es $(-100*RPD)+(100*(PER - PER\_sector))/(5*PER)$.
+\item \textit{PropuestaCambio}: es la regla que se encarga de proponer intercambiar un valor de la cartera del usuario por otro. Se inserta esta propuesta si un valor de la cartera del usuario no está infravalorado y hay otro valor que no tiene ya el usuario en la cartera y no está sobrevalorado de forma que $100*RPD\_nuevaEmp > 100*RPD + variacion\_1Ano + 1$. El rendimiento de dicha propuesta es $100*RPD\_nuevaEmp - (variacion\_1Ano + 1 + 100*RPD)$.
+\end{enumerate}
+
+\subsubsection{Módulo Cinco}
+Este módulo tiene como objetivo encontrar las cinco mejores propuestas y mostrárselas al usuario para seguidamente pedirle una acción (entre las que se recomiendan u otra a su elección). Es el módulo de interacción con el usuario. Se compone de 14 reglas:
+\begin{enumerate}
+\item \textit{FindMax}: Encuentra la propuesta con mayor rendimiento si se han mostrado menos de cinco propuestas e inserta un hecho del tipo (Max \textit{nombreValor} \textit{rendimiento}).
+\item \textit{MostrarMax}: Muestra por pantalla la propuesta asociada al máximo que coincide con el hecho (Max \textit{nombreValor} \textit{rendimiento}) que se acaba de insertar y borra la propuesta asociada con este rendimiento máximo para poder volver a buscar el máximo y que no sea el mismo. Además, aumenta el contador de propuestas mostradas en 1.
+\item \textit{PedirAccion}: Pide una acción al usuario entre Comprar, Vender, Cambio y Salir y guarda la respuesta del usuario.
+\item \textit{PedirAccionVender}: Si la respuesta del usuario ha sido Vender, pide que indique qué valor desea vender y cuántas acciones quiere vender del mismo y se inserta un hecho indicando que se quiere vender. Después, pregunta si quiere que se vuelvan a generar propuestas o desea salir y en caso de querer salir se guarda el hecho (RespuestaUsuario Salir).
+\item \textit{PedirAccionComprar}: Si la respuesta del usuario ha sido comprar, pide que indique qué valor desea comprar y cuántas acciones del mismo desea comprar y se inserta un hecho indicando que se desea comprar. Después, pregunta si quiere que se vuelvan a generar propuestas o desea salir y en caso de querer salir se guarda el hecho (RespuestaUsuario Salir).
+\item \textit{PedirAccionCambio}: Si la respuesta del usuario ha sido cambio, pide que indique qué valor desea vender y el número de acciones a vender y el valor que desea comprar y el número de acciones a comprar y se insertan hechos tanto para vender como para comprar. Después, pregunta si quiere que se vuelvan a generar propuestas o desea salir y en caso de querer salir se guarda el hecho (RespuestaUsuario Salir).
+\item \textit{CambiarCarteraVender}: Si se ha insertado un hecho con que el usuario ha elegido vender un valor se comprueba que ese valor esté en la cartera y que la cantidad de acciones actual sea mayor o igual que la cantidad de acciones que se quieren vender. De ser esto así, se elimina el hecho de querer vender, el hecho de la cartera que había sobre ese valor y el hecho de la cartera con el dinero disponible y se inserta un hecho en la cartera con el valor disponible después de la operación, y si después de la venta siguen quedando acciones, se inserta un hecho de la cartera con las acciones que queden.
+\item \textit{ErrorVender}: Comprueba si no se disponen de tantas acciones como se desean vender y avisa al usuario mediante un mensaje en pantalla.
+\item \textit{CambiarCarteraComprar}: Si se ha insertado un hecho indicando que el usuario quiere comprar un valor, se comprueba que queda suficiente dinero en la cartera para la compra, que no existiera ya ese valor en la cartera y se actualiza el valor que queda disponible en la cartera y se inserta un hecho con el nuevo valor adquirido.
+\item \textit{CambiarCarteraComprarExistente}: variante del anterior en el que se compra una acción que ya existe en la cartera y se modifica, además de todo lo anterior, el nuevo valor con la suma de las acciones que se tenían antes más las que se compran ahora.
+\item \textit{ErrorComprar}: Comprueba si no se dispone de dinero suficiente para realizar la compra de las acciones y de ser así se avisa al usuario con un mensaje por pantalla.
+\item \textit{EliminarPropuestas}: Si el usuario no ha introducido en ningún momento que quiere salir del programa es porque quiere que se vuelvan a recalcular las propuestas. Por tanto, se comprueba si se ha introducido la opción de salir y de no ser así se eliminan todas las propuestas hechas y se introduce la opción de volver al módulo uno. Esto es así porque al cambiar la cartera cambiarán las propuestas y se volverán a calcular cuando vuelva a pasar por el módulo cuatro.
+\item \textit{SalirModulo5}: Si se ha introducido la opción de volver al módulo 1, se inserta el hecho (Modulo (Numero Uno)) y se borra el hecho (Modulo (Numero Cinco)).
+\item \textit{SalirPrograma}: Si se ha introducido la opción Salir, salta al módulo salir insertando el hecho (Modulo (Numero Salir)) y borrando (Modulo (Numero Cinco)).
+\end{enumerate}
+
+\subsubsection{Módulo Seis (Salir)}
+El objetivo de este módulo es guardar la cartera del usuario sobrescribiendo el archivo \textit{Cartera.txt} con la cartera que se encuentre en ese momento en la base de hechos del programa, es decir, guardar todos los hechos del tipo (Cartera (...)) y salir del programa. Consta de cuatro reglas, una para abrir el archivo, otra para escribirlo, otra para cerrarlo y una última que se ejecuta cuando ya se ha hecho todo esto y sólo tiene la acción (exit).
 
 \section{Breve manual de uso del sistema}
+Para el correcto funcionamiento es necesario que el archivo \textit{practica.clp} se encuentre en el mismo directorio que los archivos \textit{Analisis.txt}, \textit{AnalisisSectores.txt}, \textit{Cartera.txt} y \textit{Noticias.txt}. Alrededor de las 140 primeras ejecuciones son la lectura de datos de los ficheros, la generación de los valores inestables, peligrosos, sobrevalorados, etc. y la generación de propuestas junto con su impresión por pantalla. Después se pide al usuario que introduzca una acción (se dan las posibles opciones por pantalla) y se pide que indique el valor y la cantidad de acciones a mover y si se desea salir o continuar con el programa. Si seguimos haciendo \texttt{run} se cambiará la cartera con los nuevos movimientos hechos y se continuará hasta que el usuario indique que quiere salir, momento en el que se guardará la cartera y se cerrará el programa. Para todo esto es necesario hacer \texttt{run}, y es aconsejable hacerlo poco a poco. Como he comentado después del primer \texttt{(reset)} hacer \texttt{(run 140)} e ir de 10 en 10 a partir de ahí, introduciendo los datos cuando se pidan.
 
 \end{document}
